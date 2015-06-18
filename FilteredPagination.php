@@ -63,9 +63,9 @@ class FilteredPagination
             } else {
                 $request->getSession()->set($sessionKey, $filterData);
             }
-        }
 
-        $this->queryBuilderUpdater->addFilterConditions($filter, $query);
+            $this->queryBuilderUpdater->addFilterConditions($filter, $query);
+        }
 
         return array($filter, $this->paginator->paginate($query, $request->query->get('page', 1), $perPage), false);
     }
