@@ -2,6 +2,9 @@
 VERSION 1  INITIAL RELEASE
 ==========================
 
+   Version 1.1 - Added support to pas KNP paginator parameters (pageParameterName, etc); other un-released fixes
+      19/06/2015 11:15  1.1.0  initial release
+
    Version 1.0 - Initial Release
       05/06/2015 20:09  1.0.1  Blank request data
       06/05/2015 14:55  1.0.0  initial release
