@@ -45,7 +45,7 @@ class FilteredPagination
      * @param integer $perPage
      * @return array
      */
-    public function process(Request $request, $formType, $query, $sessionKey, $perPage = 10)
+    public function process(Request $request, $formType, $query, $sessionKey, $perPage = 10, $knpParams = array())
     {
         $filter      = $this->formFactory->create($formType);
         $requestData = $request->request->get($filter->getName());
@@ -67,6 +67,6 @@ class FilteredPagination
             $this->queryBuilderUpdater->addFilterConditions($filter, $query);
         }
 
-        return array($filter, $this->paginator->paginate($query, $request->query->get('page', 1), $perPage), false);
+        return array($filter, $this->paginator->paginate($query, $request->query->get('page', 1), $perPage, $knpParams), false);
     }
 }
