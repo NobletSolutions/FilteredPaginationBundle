@@ -45,10 +45,10 @@ class FilteredPagination
      * @param integer $perPage
      * @return array
      */
-    public function process(Request $request, $formType, $query, $sessionKey, $perPage = 10, $knpParams = array('pageParameterName'=>'page'))
+    public function process(Request $request, $formType, $query, $sessionKey, $perPage = 10, $knpParams = array('pageParameterName' => 'page'))
     {
-        $filter      = $this->formFactory->create($formType);
-        $requestData = $request->request->get($filter->getName());
+        $filterForm  = $this->formFactory->create($formType);
+        $requestData = ($filterForm->getConfig()->getMethod() == 'GET') ? $request->query->get($filterForm->getName()) : $request->request->get($filterForm->getName());
 
         if (isset($requestData['reset'])) {
             $request->getSession()->remove($sessionKey);
@@ -56,18 +56,26 @@ class FilteredPagination
         }
 
         $filterData = (empty($requestData)) ? $request->getSession()->get($sessionKey, $requestData) : $requestData;
-        $filter->submit($filterData);
-        if ($filter->isSubmitted() && $filter->isValid()) {
-            if (empty($filterData)) {
-                $request->getSession()->remove($sessionKey);
-            } else {
-                $request->getSession()->set($sessionKey, $filterData);
-            }
+        if (!empty($filterData)) {
+            $filterForm->submit($filterData);
 
-            $this->queryBuilderUpdater->addFilterConditions($filter, $query);
+            if ($filterForm->isSubmitted()) {
+                if ($filterForm->isValid()) {
+                    if (empty($filterData)) {
+                        $request->getSession()->remove($sessionKey);
+                    }
+                    else {
+                        $request->getSession()->set($sessionKey, $filterData);
+                    }
+
+                    $this->queryBuilderUpdater->addFilterConditions($filterForm, $query);
+                }
+            }
         }
 
-        return array($filter, $this->paginator->paginate($query, $request->query->get($knpParams['pageParameterName'], 1), $perPage, $knpParams), false);
+        $page = $request->query->get($knpParams['pageParameterName'], 1);
+
+        return array($filterForm, $this->paginator->paginate($query, $page, $perPage, $knpParams),
+            false);
     }
 }
-

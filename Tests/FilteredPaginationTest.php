@@ -25,7 +25,7 @@ class FilteredPaginationTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $queryBuilderUpdater->expects($this->once())
+        $queryBuilderUpdater->expects($this->never())
             ->method('addFilterConditions');
 
         $router = $this->getMockBuilder('\Symfony\Component\Routing\RouterInterface')
