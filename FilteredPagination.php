@@ -21,6 +21,8 @@ class FilteredPagination
 
     private $queryBuilderUpdater;
 
+    private $knpParams = array('pageParameterName' => 'page');
+
     /**
      *
      * @param type $paginator
@@ -45,7 +47,7 @@ class FilteredPagination
      * @param integer $perPage
      * @return array
      */
-    public function process(Request $request, $formType, $query, $sessionKey, $perPage = 10, $knpParams = array('pageParameterName' => 'page'))
+    public function process(Request $request, $formType, $query, $sessionKey, $perPage = 10)
     {
         $filterForm  = $this->formFactory->create($formType);
         $requestData = ($filterForm->getConfig()->getMethod() == 'GET') ? $request->query->get($filterForm->getName()) : $request->request->get($filterForm->getName());
@@ -73,9 +75,36 @@ class FilteredPagination
             }
         }
 
-        $page = $request->query->get($knpParams['pageParameterName'], 1);
+        $page = $request->query->get($this->knpParams['pageParameterName'], 1);
 
-        return array($filterForm, $this->paginator->paginate($query, $page, $perPage, $knpParams),
+        return array($filterForm, $this->paginator->paginate($query, $page, $perPage, $this->knpParams),
             false);
+    }
+
+    /**
+     * @param array $parts
+     */
+    public function setQueryBuilderParts(array $parts)
+    {
+        $this->queryBuilderUpdater->setParts($parts);
+    }
+
+    /**
+     * @return array
+     */
+    public function getKnpParams()
+    {
+        return $this->knpParams;
+    }
+
+    /**
+     *
+     * @param array $knpParams
+     * @return \NS\FilteredPaginationBundle\FilteredPagination
+     */
+    public function setKnpParams(array $knpParams)
+    {
+        $this->knpParams = $knpParams;
+        return $this;
     }
 }
