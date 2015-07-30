@@ -1,4 +1,5 @@
-## Installation
+Installation
+============
 
     composer require ns/filtered-pagination-bundle
 
@@ -7,7 +8,8 @@ Edit AppKernel.php and add the bundle
     ...
     new NS\FilteredPaginationBundle\NSFilteredPaginationBundle(),
 
-## Usage
+Usage
+============
 
 In a controller you request the filtered pagination bundle.
 

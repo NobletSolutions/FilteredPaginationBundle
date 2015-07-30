@@ -21,6 +21,8 @@ class FilteredPagination
 
     private $queryBuilderUpdater;
 
+    private $knpParams = array('pageParameterName' => 'page');
+
     /**
      *
      * @param type $paginator
@@ -56,17 +58,53 @@ class FilteredPagination
         }
 
         $filterData = (empty($requestData)) ? $request->getSession()->get($sessionKey, $requestData) : $requestData;
-        $filter->submit($filterData);
-        if ($filter->isSubmitted() && $filter->isValid()) {
-            if (empty($filterData)) {
-                $request->getSession()->remove($sessionKey);
-            } else {
-                $request->getSession()->set($sessionKey, $filterData);
-            }
+        if (!empty($filterData)) {
+            $filterForm->submit($filterData);
 
-            $this->queryBuilderUpdater->addFilterConditions($filter, $query);
+            if ($filterForm->isSubmitted()) {
+                if ($filterForm->isValid()) {
+                    if (empty($filterData)) {
+                        $request->getSession()->remove($sessionKey);
+                    }
+                    else {
+                        $request->getSession()->set($sessionKey, $filterData);
+                    }
+
+                    $this->queryBuilderUpdater->addFilterConditions($filterForm, $query);
+                }
+            }
         }
 
-        return array($filter, $this->paginator->paginate($query, $request->query->get('page', 1), $perPage), false);
+        $page = $request->query->get($this->knpParams['pageParameterName'], 1);
+
+        return array($filterForm, $this->paginator->paginate($query, $page, $perPage, $this->knpParams),
+            false);
+    }
+
+    /**
+     * @param array $parts
+     */
+    public function setQueryBuilderParts(array $parts)
+    {
+        $this->queryBuilderUpdater->setParts($parts);
+    }
+
+    /**
+     * @return array
+     */
+    public function getKnpParams()
+    {
+        return $this->knpParams;
+    }
+
+    /**
+     *
+     * @param array $knpParams
+     * @return \NS\FilteredPaginationBundle\FilteredPagination
+     */
+    public function setKnpParams(array $knpParams)
+    {
+        $this->knpParams = $knpParams;
+        return $this;
     }
 }
