@@ -53,8 +53,12 @@ class FilteredPagination
         $requestData = ($filterForm->getConfig()->getMethod() == 'GET') ? $request->query->get($filterForm->getName()) : $request->request->get($filterForm->getName());
 
         if (isset($requestData['reset'])) {
-            $request->getSession()->remove($sessionKey);
-            return array(null, null, true);
+            if($filterForm->getConfig()->getMethod() == 'POST') {
+                $request->getSession()->remove($sessionKey);
+                return array($filterForm, null, true);
+            } else {
+                $request->getSession()->set($sessionKey, array());
+            }
         }
 
         $filterData = (empty($requestData)) ? $request->getSession()->get($sessionKey, $requestData) : $requestData;

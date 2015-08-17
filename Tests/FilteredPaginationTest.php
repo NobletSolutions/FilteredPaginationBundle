@@ -117,7 +117,7 @@ class FilteredPaginationTest extends TypeTestCase
 
         list($form, $pagination, $redirect) = $filteredPagination->process($request, $formType, $query, self::TEST_KEY);
         $this->assertNull($pagination);
-        $this->assertNull($form);
+        $this->assertNotNull($form);
         $this->assertTrue($redirect);
         $this->assertNull($session->get(self::TEST_KEY));
     }

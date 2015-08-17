@@ -20,6 +20,7 @@ class FilteredPaginationForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->setMethod('POST')
             ->add('date')
             ->add('amount')
             ->add('filter', 'submit', array('attr' => array('class' => 'btn btn-sm btn-success pull-right')))
