@@ -2,6 +2,7 @@
     "name": "ns/filtered-pagination-bundle",
     "type": "symfony-bundle",
     "description": "This bundle provides a paginated filter handler",
+    "license": "MIT",
     "minimum-stability": "stable",
     "authors": [
         {
