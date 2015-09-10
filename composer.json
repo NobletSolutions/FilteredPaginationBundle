@@ -22,7 +22,6 @@
         "liip/rmt": "~1.1"
     },
     "autoload": {
-        "psr-0": { "NS\\FilteredPaginationBundle": "" }
-    },
-    "target-dir": "NS/FilteredPaginationBundle"
+        "psr-4": { "NS\\FilteredPaginationBundle\\": "" }
+    }
 }
