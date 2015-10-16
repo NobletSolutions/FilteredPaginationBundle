@@ -45,6 +45,7 @@ class FilteredPagination
      * @param Query $query
      * @param string $sessionKey
      * @param integer $perPage
+     * @param array $formOptions
      * @return array
      */
     public function process(Request $request, $formType, $query, $sessionKey, $perPage = 10, array $formOptions = array())
@@ -56,9 +57,10 @@ class FilteredPagination
             if($filterForm->getConfig()->getMethod() == 'POST') {
                 $request->getSession()->remove($sessionKey);
                 return array($filterForm, null, true);
-            } else {
-                $request->getSession()->set($sessionKey, array());
             }
+
+            $request->getSession()->set($sessionKey, array());
+            $requestData = array();
         }
 
         $filterData = (empty($requestData)) ? $request->getSession()->get($sessionKey, $requestData) : $requestData;
