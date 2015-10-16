@@ -3,6 +3,7 @@ VERSION 1  INITIAL RELEASE
 ==========================
 
    Version 1.1 - Added support to pas KNP paginator parameters (pageParameterName, etc); other un-released fixes
+      16/10/2015 00:12  1.0.8  Fix the reset via get method
       17/08/2015 14:15  1.0.7  Handle post and get differently
       29/07/2015 23:51  1.0.6  Form options
       06/07/2015 22:53  1.0.5  Added wrapper helpers
