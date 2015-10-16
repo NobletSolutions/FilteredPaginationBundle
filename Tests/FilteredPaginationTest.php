@@ -64,7 +64,7 @@ class FilteredPaginationTest extends TypeTestCase
         $this->assertFalse($redirect);
     }
 
-    public function testReset()
+    public function testPostReset()
     {
         $queryBuilderUpdater = $this->getMockBuilder('\Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface')
             ->disableOriginalConstructor()
@@ -105,8 +105,8 @@ class FilteredPaginationTest extends TypeTestCase
 
         $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater, $router);
         $session            = new Session(new MockArraySessionStorage());
-        $session->set(self::TEST_KEY, 'something');
-        $this->assertEquals('something', $session->get(self::TEST_KEY));
+        $session->set(self::TEST_KEY, array('amount'=>10.00));
+        $this->assertEquals(array('amount'=>10.00), $session->get(self::TEST_KEY));
         $request            = new Request();
         $request->request->set('FilteredPaginationForm', $formData);
         $this->assertEquals($formData, $request->request->get('FilteredPaginationForm'));
@@ -120,6 +120,72 @@ class FilteredPaginationTest extends TypeTestCase
         $this->assertNotNull($form);
         $this->assertTrue($redirect);
         $this->assertNull($session->get(self::TEST_KEY));
+        $this->assertFalse($form->isSubmitted());
+        $this->assertNull($form['amount']->getData());
+    }
+
+    public function testGetReset()
+    {
+        $queryBuilderUpdater = $this->getMockBuilder('\Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $queryBuilderUpdater->expects($this->never())
+            ->method('addFilterConditions');
+
+        $router = $this->getMockBuilder('\Symfony\Component\Routing\RouterInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $config = new \NS\FilteredPaginationBundle\Tests\Configuration();
+        $entityMgr = $this->getMockBuilder('\Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityMgr->expects($this->any())
+            ->method('getConfiguration')
+            ->willReturn($config);
+
+        $query = new Query($entityMgr);
+        $query->setDQL('SELECT s FROM NSFilteredPaginationBundle:Payment s');
+
+        $paginator = $this->getMockBuilder('\Knp\Component\Pager\Paginator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $paginator->expects($this->any())
+            ->method('paginate')
+            ->with($query, 1, 10)
+            ->willReturn(array());
+
+        $formData = array(
+            'date'   => '',
+            'amount' => 10.00,
+            'reset'  => '',
+        );
+
+        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater, $router);
+        $session            = new Session(new MockArraySessionStorage());
+        $session->set(self::TEST_KEY, array('amount'=>10.00));
+        $this->assertEquals(array('amount'=>10.00), $session->get(self::TEST_KEY));
+        $request            = new Request();
+        $request->query->set('FilteredPaginationForm', $formData);
+        $this->assertEquals($formData, $request->query->get('FilteredPaginationForm'));
+        $request->setSession($session);
+
+        $formType           = new FilteredPaginationForm();
+        $formOne            = $this->factory->create($formType);
+        $this->assertEquals('FilteredPaginationForm', $formOne->getName());
+
+        list($form, $pagination, $redirect) = $filteredPagination->process($request, $formType, $query, self::TEST_KEY,10,array('method'=>'GET'));
+
+        $this->assertNotNull($form);
+        $this->assertEquals('GET',$form->getConfig()->getOption('method'));
+        $this->assertEquals('GET',$form->getConfig()->getMethod());
+        $this->assertNotNull($pagination);
+        $this->assertFalse($redirect);
+        $this->assertEmpty($session->get(self::TEST_KEY));
+        $this->assertFalse($form->isSubmitted());
+        $this->assertNull($form['amount']->getData());
     }
 
     public function testSubmit()

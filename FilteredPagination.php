@@ -51,10 +51,11 @@ class FilteredPagination
     public function process(Request $request, $formType, $query, $sessionKey, $perPage = 10, array $formOptions = array())
     {
         $filterForm  = $this->formFactory->create($formType,null,$formOptions);
-        $requestData = ($filterForm->getConfig()->getMethod() == 'GET') ? $request->query->get($filterForm->getName()) : $request->request->get($filterForm->getName());
+        $method = $filterForm->getConfig()->getMethod();
+        $requestData = ($method == 'GET') ? $request->query->get($filterForm->getName()) : $request->request->get($filterForm->getName());
 
         if (isset($requestData['reset'])) {
-            if($filterForm->getConfig()->getMethod() == 'POST') {
+            if($method == 'POST') {
                 $request->getSession()->remove($sessionKey);
                 return array($filterForm, null, true);
             }
