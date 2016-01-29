@@ -8,7 +8,6 @@ use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 use \Symfony\Component\Form\AbstractType;
 use \Symfony\Component\Form\FormFactoryInterface;
 use \Symfony\Component\HttpFoundation\Request;
-use \Symfony\Component\Routing\RouterInterface;
 
 /**
  * Description of FilteredPagination

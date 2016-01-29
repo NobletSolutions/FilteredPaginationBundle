@@ -20,3 +20,4 @@ In a controller you request the filtered pagination bundle.
     if ($redirect) {
         return $this->redirect($this->generateUrl('practiceUsers'));
     }
+

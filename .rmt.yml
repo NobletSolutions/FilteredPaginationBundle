@@ -34,3 +34,4 @@ master:
         changelog-update:          # Update a CHANGELOG file before the release
             format: semantic
         vcs-commit: ~              # Commit the CHANGELOG
+
