@@ -111,8 +111,8 @@ class FilteredPagination
     public function updatePerPage(Request $request, $sessionKey)
     {
         $limitSessionKey = sprintf('%s.limit',$sessionKey);
-        if ($request->request->getInt('limit')) {
-            $this->perPage = $request->request->getInt('limit');
+        if ($request->query->getInt('limit')) {
+            $this->perPage = $request->query->getInt('limit');
             $request->getSession()->set($limitSessionKey, $this->perPage);
         } elseif ($request->getSession()->has($limitSessionKey)) {
             $this->perPage = $request->getSession()->get($limitSessionKey,$this->perPage);
