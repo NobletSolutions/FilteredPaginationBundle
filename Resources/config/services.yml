@@ -1,4 +1,4 @@
 services:
     ns.filtered_pagination:
         class: NS\FilteredPaginationBundle\FilteredPagination
-        arguments: [ @knp_paginator, '@form.factory', @lexik_form_filter.query_builder_updater, @router ]
+        arguments: [ "@knp_paginator", "@form.factory", "@lexik_form_filter.query_builder_updater" ]

@@ -9,6 +9,7 @@ use \Symfony\Component\Form\Test\TypeTestCase;
 use \Symfony\Component\HttpFoundation\Request;
 use \Symfony\Component\HttpFoundation\Session\Session;
 use \Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use \NS\FilteredPaginationBundle\Tests\Configuration;
 
 /**
  * Description of FilteredPaginationTest
@@ -28,11 +29,7 @@ class FilteredPaginationTest extends TypeTestCase
         $queryBuilderUpdater->expects($this->never())
             ->method('addFilterConditions');
 
-        $router = $this->getMockBuilder('\Symfony\Component\Routing\RouterInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $config = new \NS\FilteredPaginationBundle\Tests\Configuration();
+        $config = new Configuration();
         $entityMgr = $this->getMockBuilder('\Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -52,7 +49,7 @@ class FilteredPaginationTest extends TypeTestCase
             ->with($query, 1, 10)
             ->willReturn(array());
 
-        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater, $router);
+        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater);
         $session            = new Session(new MockArraySessionStorage());
         $request            = new Request();
         $request->setSession($session);
@@ -73,11 +70,7 @@ class FilteredPaginationTest extends TypeTestCase
         $queryBuilderUpdater->expects($this->never())
             ->method('addFilterConditions');
 
-        $router = $this->getMockBuilder('\Symfony\Component\Routing\RouterInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $config = new \NS\FilteredPaginationBundle\Tests\Configuration();
+        $config = new Configuration();
         $entityMgr = $this->getMockBuilder('\Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -103,7 +96,7 @@ class FilteredPaginationTest extends TypeTestCase
             'reset'  => '',
         );
 
-        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater, $router);
+        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater);
         $session            = new Session(new MockArraySessionStorage());
         $session->set(self::TEST_KEY, array('amount'=>10.00));
         $this->assertEquals(array('amount'=>10.00), $session->get(self::TEST_KEY));
@@ -133,11 +126,7 @@ class FilteredPaginationTest extends TypeTestCase
         $queryBuilderUpdater->expects($this->never())
             ->method('addFilterConditions');
 
-        $router = $this->getMockBuilder('\Symfony\Component\Routing\RouterInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $config = new \NS\FilteredPaginationBundle\Tests\Configuration();
+        $config = new Configuration();
         $entityMgr = $this->getMockBuilder('\Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -163,7 +152,7 @@ class FilteredPaginationTest extends TypeTestCase
             'reset'  => '',
         );
 
-        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater, $router);
+        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater);
         $session            = new Session(new MockArraySessionStorage());
         $session->set(self::TEST_KEY, array('amount'=>10.00));
         $this->assertEquals(array('amount'=>10.00), $session->get(self::TEST_KEY));
@@ -176,7 +165,7 @@ class FilteredPaginationTest extends TypeTestCase
         $formOne            = $this->factory->create($formType);
         $this->assertEquals('FilteredPaginationForm', $formOne->getName());
 
-        list($form, $pagination, $redirect) = $filteredPagination->process($request, $formType, $query, self::TEST_KEY,10,array('method'=>'GET'));
+        list($form, $pagination, $redirect) = $filteredPagination->process($request, $formType, $query, self::TEST_KEY, array('method'=>'GET'));
 
         $this->assertNotNull($form);
         $this->assertEquals('GET',$form->getConfig()->getOption('method'));
@@ -196,10 +185,6 @@ class FilteredPaginationTest extends TypeTestCase
 
         $queryBuilderUpdater->expects($this->once())
             ->method('addFilterConditions');
-
-        $router = $this->getMockBuilder('\Symfony\Component\Routing\RouterInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
 
         $config = new \NS\FilteredPaginationBundle\Tests\Configuration();
         $entityMgr = $this->getMockBuilder('\Doctrine\ORM\EntityManager')
@@ -227,7 +212,7 @@ class FilteredPaginationTest extends TypeTestCase
             'filter' => '',
         );
 
-        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater, $router);
+        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater);
         $session            = new Session(new MockArraySessionStorage());
         $session->set(self::TEST_KEY, 'something');
         $this->assertEquals('something', $session->get(self::TEST_KEY));
@@ -244,5 +229,96 @@ class FilteredPaginationTest extends TypeTestCase
         $this->assertEquals(array(), $pagination);
         $this->assertFalse($redirect);
         $this->assertEquals($formData, $request->getSession()->get(self::TEST_KEY));
+    }
+
+//    /**
+//     * @param Request $request
+//     * @param string $sessionKey
+//     */
+//    public function updatePerPage(Request $request, $sessionKey)
+//    {
+//        $limitSessionKey = sprintf('%s.limit',$sessionKey);
+//        if ($request->request->getInt('limit')) {
+//            $this->perPage = $request->request->getInt('limit');
+//            $request->getSession()->set($limitSessionKey, $this->perPage);
+//        } elseif ($request->getSession()->has($limitSessionKey)) {
+//            $this->perPage = $request->getSession()->get($limitSessionKey,$this->perPage);
+//        }
+//    }
+
+    public function testPerPage()
+    {
+        $queryBuilderUpdater = $this->getMockBuilder('\Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $paginator = $this->getMockBuilder('\Knp\Component\Pager\Paginator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater);
+        $session            = new Session(new MockArraySessionStorage());
+        $request            = new Request();
+        $request->setSession($session);
+
+        $this->assertEquals(10,$filteredPagination->getPerPage());
+        $this->assertFalse($session->has(self::TEST_KEY.'-limit'));
+
+        $filteredPagination->updatePerPage($request,self::TEST_KEY);
+        $this->assertEquals(10,$filteredPagination->getPerPage());
+        $this->assertFalse($session->has(self::TEST_KEY.'-limit'));
+    }
+
+    public function testRequestPerPage()
+    {
+        $queryBuilderUpdater = $this->getMockBuilder('\Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $paginator = $this->getMockBuilder('\Knp\Component\Pager\Paginator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater);
+        $session            = new Session(new MockArraySessionStorage());
+        $request            = new Request();
+        $request->request->set('limit',25);
+        $request->setSession($session);
+
+        $this->assertEquals(10,$filteredPagination->getPerPage());
+        $this->assertFalse($session->has(self::TEST_KEY.'.limit'));
+
+        $filteredPagination->updatePerPage($request,self::TEST_KEY);
+        $this->assertEquals(25,$filteredPagination->getPerPage());
+        $this->assertTrue($session->has(self::TEST_KEY.'.limit'));
+        $this->assertEquals(25,$session->get(self::TEST_KEY.'.limit'));
+    }
+
+    public function testSessionPerPage()
+    {
+        $queryBuilderUpdater = $this->getMockBuilder('\Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $paginator = $this->getMockBuilder('\Knp\Component\Pager\Paginator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $limitKey = self::TEST_KEY.'.limit';
+
+        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater);
+        $session            = new Session(new MockArraySessionStorage());
+        $session->set($limitKey,45);
+
+        $request            = new Request();
+        $request->setSession($session);
+
+        $this->assertEquals(10,$filteredPagination->getPerPage());
+        $this->assertTrue($session->has(self::TEST_KEY.'.limit'));
+
+        $filteredPagination->updatePerPage($request,self::TEST_KEY);
+        $this->assertEquals(45,$filteredPagination->getPerPage());
+        $this->assertTrue($session->has(self::TEST_KEY.'.limit'));
+        $this->assertEquals(45,$session->get(self::TEST_KEY.'.limit'));
     }
 }
