@@ -14,6 +14,6 @@ class LimitSelectType extends AbstractType
     {
         $builder
             ->setMethod('GET')
-            ->add('limit','choice',array('choices'=>array(10,25,50,75,100)));
+            ->add('limit','choice',array('choices'=>array(10=>10,25=>25,50=>50,75=>75,100=>100)));
     }
 }
