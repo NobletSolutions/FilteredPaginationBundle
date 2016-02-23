@@ -5,6 +5,8 @@ namespace NS\FilteredPaginationBundle;
 use \Doctrine\ORM\Query;
 use Knp\Component\Pager\Paginator;
 use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
+use NS\FilteredPaginationBundle\Events\FilterEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use \Symfony\Component\Form\AbstractType;
 use \Symfony\Component\Form\FormFactoryInterface;
 use \Symfony\Component\HttpFoundation\Request;
@@ -32,6 +34,11 @@ class FilteredPagination
     private $queryBuilderUpdater;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
      * @var array
      */
     private $knpParams = array('pageParameterName' => 'page');
@@ -47,11 +54,12 @@ class FilteredPagination
      * @param FormFactoryInterface $formFactory
      * @param FilterBuilderUpdaterInterface $queryBuilderUpdater
      */
-    public function __construct(Paginator $pager, FormFactoryInterface $formFactory, FilterBuilderUpdaterInterface $queryBuilderUpdater)
+    public function __construct(Paginator $pager, FormFactoryInterface $formFactory, FilterBuilderUpdaterInterface $queryBuilderUpdater, EventDispatcherInterface $dispatcher)
     {
         $this->paginator = $pager;
         $this->formFactory = $formFactory;
         $this->queryBuilderUpdater = $queryBuilderUpdater;
+        $this->eventDispatcher = $dispatcher;
     }
 
     /**
@@ -91,6 +99,8 @@ class FilteredPagination
                         $request->getSession()->set($sessionKey, $filterData);
                     }
 
+                    $this->eventDispatcher->dispatch(FilterEvent::PRE_FILTER, new FilterEvent($query));
+
                     $this->queryBuilderUpdater->addFilterConditions($filterForm, $query);
                 }
             }
@@ -98,10 +108,11 @@ class FilteredPagination
 
         $this->updatePerPage($request,$sessionKey);
 
-        $page = $request->query->get($this->knpParams['pageParameterName'], 1);
+        $page  = $request->query->get($this->knpParams['pageParameterName'], 1);
+        $event = $this->eventDispatcher->dispatch(FilterEvent::POST_FILTER, new FilterEvent($query));
+        $query = $event->getQueryBuilder();
 
-        return array($filterForm, $this->paginator->paginate($query, $page, $this->perPage, $this->knpParams),
-            false);
+        return array($filterForm, $this->paginator->paginate($query, $page, $this->perPage, $this->knpParams), false);
     }
 
     /**
