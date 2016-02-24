@@ -3,6 +3,7 @@ VERSION 2  CHANGE HOW WE HANDLE PER-PAGE RESULTS
 ================================================
 
    Version 2.0 - Change how we handle per-page results
+      24/02/2016 09:56  2.0.4  Updated filtering handling
       23/02/2016 16:57  2.0.3  Added filter events
       04/02/2016 18:40  2.0.2  Fix select keys
       29/01/2016 16:31  2.0.1  Fix request query
