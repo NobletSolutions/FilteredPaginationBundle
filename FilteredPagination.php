@@ -110,8 +110,8 @@ class FilteredPagination
 
         $page  = $request->query->get($this->knpParams['pageParameterName'], 1);
         $event = $this->eventDispatcher->dispatch(FilterEvent::POST_FILTER, new FilterEvent($query));
-        if ($event->hasQuery()) {
-            $query = $event->getQuery();
+        if ($event->hasNewQuery()) {
+            $query = $event->getNewQuery();
         }
 
         return array($filterForm, $this->paginator->paginate($query, $page, $this->perPage, $this->knpParams), false);

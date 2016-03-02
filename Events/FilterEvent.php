@@ -13,55 +13,55 @@ class FilterEvent extends Event
     const POST_FILTER = 'filtered_pagination.post_filter';
 
     /**
-     * @var QueryBuilder
+     * @var Query|QueryBuilder
      */
-    private $queryBuilder;
+    private $orgQuery;
 
     /**
-     * @var Query
+     * @var Query|QueryBuilder
      */
-    private $query;
+    private $newQuery;
 
     /**
      * FilterEvent constructor.
-     * @param $queryBuilder
+     * @param $orgQuery
      */
-    public function __construct(QueryBuilder $queryBuilder)
+    public function __construct($orgQuery)
     {
-        $this->queryBuilder = $queryBuilder;
+        $this->orgQuery = $orgQuery;
     }
 
     /**
      * @return QueryBuilder
      */
-    public function getQueryBuilder()
+    public function getOriginalQuery()
     {
-        return $this->queryBuilder;
+        return $this->orgQuery;
     }
 
     /**
      * @return bool
      */
-    public function hasQuery()
+    public function hasNewQuery()
     {
-        return ($this->query instanceof Query);
+        return ($this->newQuery !== null);
     }
 
     /**
      * @return Query
      */
-    public function getQuery()
+    public function getNewQuery()
     {
-        return $this->query;
+        return $this->newQuery;
     }
 
     /**
      * @param Query $query
      * @return FilterEvent
      */
-    public function setQuery($query)
+    public function setNewQuery($query)
     {
-        $this->query = $query;
+        $this->newQuery = $query;
         return $this;
     }
 }
