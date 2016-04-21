@@ -4,6 +4,7 @@ namespace NS\FilteredPaginationBundle\Tests;
 
 use \Symfony\Component\Form\AbstractType;
 use \Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use \Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -23,9 +24,17 @@ class FilteredPaginationForm extends AbstractType
             ->setMethod($options['method'])
             ->add('date')
             ->add('amount')
-            ->add('filter', 'submit', array('attr' => array('class' => 'btn btn-sm btn-success pull-right')))
-            ->add('reset', 'submit', array('attr' => array('class' => 'btn btn-sm btn-info')))
+            ->add('filter', 'Symfony\Component\Form\Extension\Core\Type\SubmitType', array('attr' => array('class' => 'btn btn-sm btn-success pull-right')))
+            ->add('reset', 'Symfony\Component\Form\Extension\Core\Type\SubmitType', array('attr' => array('class' => 'btn btn-sm btn-info')))
         ;
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(array(
+            'data_class' => 'NS\FilteredPaginationBundle\Tests\Filters\Payment',
+            'method'=>'POST',
+        ));
     }
 
     /**
@@ -33,10 +42,7 @@ class FilteredPaginationForm extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'data_class' => 'NS\FilteredPaginationBundle\Tests\Filters\Payment',
-            'method'=>'POST',
-        ));
+        $this->configureOptions($resolver);
     }
 
     /**

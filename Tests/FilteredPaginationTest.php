@@ -42,9 +42,8 @@ class FilteredPaginationTest extends TypeTestCase
         $session            = new Session(new MockArraySessionStorage());
         $request            = new Request();
         $request->setSession($session);
-        $formType           = new FilteredPaginationForm();
 
-        list($form, $pagination, $redirect) = $filteredPagination->process($request, $formType, $query, self::TEST_KEY);
+        list($form, $pagination, $redirect) = $filteredPagination->process($request, 'NS\FilteredPaginationBundle\Tests\FilteredPaginationForm', $query, self::TEST_KEY);
         $this->assertInstanceOf('Symfony\Component\Form\Form', $form);
         $this->assertEquals(array(), $pagination);
         $this->assertFalse($redirect);
@@ -80,11 +79,8 @@ class FilteredPaginationTest extends TypeTestCase
         $request->request->set('FilteredPaginationForm', $formData);
         $this->assertEquals($formData, $request->request->get('FilteredPaginationForm'));
         $request->setSession($session);
-        $formType           = new FilteredPaginationForm();
-        $formOne            = $this->factory->create($formType);
-        $this->assertEquals('FilteredPaginationForm', $formOne->getName());
 
-        list($form, $pagination, $redirect) = $filteredPagination->process($request, $formType, $query, self::TEST_KEY);
+        list($form, $pagination, $redirect) = $filteredPagination->process($request, 'NS\FilteredPaginationBundle\Tests\FilteredPaginationForm', $query, self::TEST_KEY);
         $this->assertNull($pagination);
         $this->assertNotNull($form);
         $this->assertTrue($redirect);
@@ -124,11 +120,7 @@ class FilteredPaginationTest extends TypeTestCase
         $this->assertEquals($formData, $request->query->get('FilteredPaginationForm'));
         $request->setSession($session);
 
-        $formType           = new FilteredPaginationForm();
-        $formOne            = $this->factory->create($formType);
-        $this->assertEquals('FilteredPaginationForm', $formOne->getName());
-
-        list($form, $pagination, $redirect) = $filteredPagination->process($request, $formType, $query, self::TEST_KEY, array('method'=>'GET'));
+        list($form, $pagination, $redirect) = $filteredPagination->process($request, 'NS\FilteredPaginationBundle\Tests\FilteredPaginationForm', $query, self::TEST_KEY, array('method'=>'GET'));
 
         $this->assertNotNull($form);
         $this->assertEquals('GET',$form->getConfig()->getOption('method'));
@@ -171,11 +163,9 @@ class FilteredPaginationTest extends TypeTestCase
         $request->request->set('FilteredPaginationForm', $formData);
         $this->assertEquals($formData, $request->request->get('FilteredPaginationForm'));
         $request->setSession($session);
-        $formType           = new FilteredPaginationForm();
-        $formOne            = $this->factory->create($formType);
-        $this->assertEquals('FilteredPaginationForm', $formOne->getName());
 
-        list($form, $pagination, $redirect) = $filteredPagination->process($request, $formType, $query, self::TEST_KEY);
+        list($form, $pagination, $redirect) = $filteredPagination->process($request, 'NS\FilteredPaginationBundle\Tests\FilteredPaginationForm', $query, self::TEST_KEY);
+
         $this->assertInstanceOf('Symfony\Component\Form\Form', $form);
         $this->assertEquals(array(), $pagination);
         $this->assertFalse($redirect);

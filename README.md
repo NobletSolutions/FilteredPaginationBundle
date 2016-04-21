@@ -21,3 +21,9 @@ In a controller you request the filtered pagination bundle.
         return $this->redirect($this->generateUrl('practiceUsers'));
     }
 
+Limit Select
+============
+
+You can use the provided LimitSelectType to provide a 'X' results per page selector. If you do so
+you should include the main.js resource which handles detecting changes to the number per page.
+
