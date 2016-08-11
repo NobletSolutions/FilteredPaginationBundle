@@ -2,14 +2,15 @@
 
 namespace NS\FilteredPaginationBundle;
 
-use \Doctrine\ORM\Query;
+use Doctrine\ORM\Query;
 use Knp\Component\Pager\Paginator;
 use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 use NS\FilteredPaginationBundle\Events\FilterEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use \Symfony\Component\Form\AbstractType;
-use \Symfony\Component\Form\FormFactoryInterface;
-use \Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Description of FilteredPagination
@@ -53,6 +54,7 @@ class FilteredPagination
      * @param Paginator $pager
      * @param FormFactoryInterface $formFactory
      * @param FilterBuilderUpdaterInterface $queryBuilderUpdater
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(Paginator $pager, FormFactoryInterface $formFactory, FilterBuilderUpdaterInterface $queryBuilderUpdater, EventDispatcherInterface $dispatcher)
     {
