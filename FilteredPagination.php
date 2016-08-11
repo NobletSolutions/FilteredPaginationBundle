@@ -176,4 +176,13 @@ class FilteredPagination
         $this->knpParams = $knpParams;
         return $this;
     }
+
+    /**
+     * @param $key
+     * @param $value
+     */
+    public function addKnpParam($key, $value)
+    {
+        $this->knpParams[$key] = $value;
+    }
 }
