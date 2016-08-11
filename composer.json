@@ -13,9 +13,9 @@
 
     "require": {
         "php":                          ">=5.3.2",
-	"symfony/symfony":              "^2.7|^3.0",
+	"symfony/symfony":              "^2.7",
         "knplabs/knp-paginator-bundle": "~2.4",
-        "lexik/form-filter-bundle":     "^3.0|^4.0|^5.0"
+        "lexik/form-filter-bundle":     "^3.0|^4.0"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0",
@@ -23,5 +23,10 @@
     },
     "autoload": {
         "psr-4": { "NS\\FilteredPaginationBundle\\": "" }
+    },
+    "extra": {
+        "branch-alias": {
+           "dev-master": "2.0.x-dev"
+        }
     }
 }
