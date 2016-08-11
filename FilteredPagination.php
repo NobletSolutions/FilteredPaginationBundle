@@ -91,20 +91,11 @@ class FilteredPagination
 
         $filterData = (empty($requestData)) ? $request->getSession()->get($sessionKey, $requestData) : $requestData;
         if (!empty($filterData)) {
-            $filterForm->submit($filterData);
-
-            if ($filterForm->isSubmitted()) {
-                if ($filterForm->isValid()) {
-                    if (empty($filterData)) {
-                        $request->getSession()->remove($sessionKey);
-                    } else {
-                        $request->getSession()->set($sessionKey, $filterData);
-                    }
-
-                    $this->eventDispatcher->dispatch(FilterEvent::PRE_FILTER, new FilterEvent($query));
-
-                    $this->queryBuilderUpdater->addFilterConditions($filterForm, $query);
-                }
+            $this->applyFilter($filterForm, $filterData, $query);
+            if (empty($filterData)) {
+                $request->getSession()->remove($sessionKey);
+            } else {
+                $request->getSession()->set($sessionKey, $filterData);
             }
         }
 
@@ -117,6 +108,22 @@ class FilteredPagination
         }
 
         return array($filterForm, $this->paginator->paginate($query, $page, $this->perPage, $this->knpParams), false);
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param $filterData
+     * @param $query
+     */
+    public function applyFilter(FormInterface $form, $filterData, $query)
+    {
+        $form->submit($filterData);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->eventDispatcher->dispatch(FilterEvent::PRE_FILTER, new FilterEvent($query));
+
+            $this->queryBuilderUpdater->addFilterConditions($form, $query);
+        }
     }
 
     /**
