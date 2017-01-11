@@ -6,6 +6,8 @@ Installation
 Edit AppKernel.php and add the bundle
 
     ...
+    new Knp\Bundle\PaginatorBundle\KnpPaginatorBundle(),
+    new Lexik\Bundle\FormFilterBundle\LexikFormFilterBundle(),
     new NS\FilteredPaginationBundle\NSFilteredPaginationBundle(),
 
 Usage
