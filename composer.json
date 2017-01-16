@@ -22,7 +22,10 @@
         "liip/rmt": "~1.1"
     },
     "autoload": {
-        "psr-4": { "NS\\FilteredPaginationBundle\\": "" }
+        "psr-4": { "NS\\FilteredPaginationBundle\\": "src" }
+    },
+    "autoload-dev": {
+        "psr-4": { "NS\\FilteredPaginationBundle\\Tests\\": "Tests" }
     },
     "extra": {
         "branch-alias": {
