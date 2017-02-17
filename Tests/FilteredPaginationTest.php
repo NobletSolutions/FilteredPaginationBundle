@@ -81,7 +81,7 @@ class FilteredPaginationTest extends TypeTestCase
         $this->assertEquals($formData, $request->request->get('FilteredPaginationForm'));
         $request->setSession($session);
 
-        list($form, $pagination, $redirect) = $filteredPagination->process($request, 'NS\FilteredPaginationBundle\Tests\FilteredPaginationForm', $query, self::TEST_KEY);
+        list($form, $pagination, $redirect) = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY);
         $this->assertNull($pagination);
         $this->assertNotNull($form);
         $this->assertTrue($redirect);
@@ -119,7 +119,7 @@ class FilteredPaginationTest extends TypeTestCase
         $this->assertEquals($formData, $request->query->get('FilteredPaginationForm'));
         $request->setSession($session);
 
-        list($form, $pagination, $redirect) = $filteredPagination->process($request, 'NS\FilteredPaginationBundle\Tests\FilteredPaginationForm', $query, self::TEST_KEY, array('method'=>'GET'));
+        list($form, $pagination, $redirect) = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY, array('method'=>'GET'));
 
         $this->assertNotNull($form);
         $this->assertEquals('GET',$form->getConfig()->getOption('method'));
