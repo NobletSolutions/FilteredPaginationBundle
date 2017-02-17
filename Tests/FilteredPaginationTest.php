@@ -2,15 +2,20 @@
 
 namespace NS\FilteredPaginationBundle\Tests\Pagination;
 
-use \Doctrine\ORM\Query;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query;
+use Knp\Component\Pager\Paginator;
+use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 use NS\FilteredPaginationBundle\Events\FilterEvent;
-use \NS\FilteredPaginationBundle\FilteredPagination;
-use \NS\FilteredPaginationBundle\Tests\FilteredPaginationForm;
-use \Symfony\Component\Form\Test\TypeTestCase;
-use \Symfony\Component\HttpFoundation\Request;
-use \Symfony\Component\HttpFoundation\Session\Session;
-use \Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use \NS\FilteredPaginationBundle\Tests\Configuration;
+use NS\FilteredPaginationBundle\FilteredPagination;
+use NS\FilteredPaginationBundle\Tests\FilteredPaginationForm;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use NS\FilteredPaginationBundle\Tests\Configuration;
 
 /**
  * Description of FilteredPaginationTest
@@ -23,27 +28,25 @@ class FilteredPaginationTest extends TypeTestCase
 
     public function testEmpty()
     {
-        list($queryBuilderUpdater, $paginator, $dispatcher, $entityMgr) = $this->getArguments(true);
-
-        $queryBuilderUpdater
+        $this->queryBuilderUpdater
             ->expects($this->never())
             ->method('addFilterConditions');
 
-        $query = new Query($entityMgr);
+        $query = new Query($this->entityMgr);
         $query->setDQL('SELECT s FROM NSFilteredPaginationBundle:Payment s');
 
-        $paginator
+        $this->paginator
             ->expects($this->once())
             ->method('paginate')
             ->with($query, 1, 10)
             ->willReturn(array());
 
-        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater,$dispatcher);
+        $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
         $session            = new Session(new MockArraySessionStorage());
         $request            = new Request();
         $request->setSession($session);
 
-        list($form, $pagination, $redirect) = $filteredPagination->process($request, 'NS\FilteredPaginationBundle\Tests\FilteredPaginationForm', $query, self::TEST_KEY);
+        list($form, $pagination, $redirect) = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY);
         $this->assertInstanceOf('Symfony\Component\Form\Form', $form);
         $this->assertEquals(array(), $pagination);
         $this->assertFalse($redirect);
@@ -51,16 +54,14 @@ class FilteredPaginationTest extends TypeTestCase
 
     public function testPostReset()
     {
-        list($queryBuilderUpdater, $paginator, $dispatcher, $entityMgr) = $this->getArguments(true);
-
-        $queryBuilderUpdater
+        $this->queryBuilderUpdater
             ->expects($this->never())
             ->method('addFilterConditions');
 
-        $query = new Query($entityMgr);
+        $query = new Query($this->entityMgr);
         $query->setDQL('SELECT s FROM NSFilteredPaginationBundle:Payment s');
 
-        $paginator->expects($this->never())
+        $this->paginator->expects($this->never())
             ->method('paginate')
             ->with($query, 1, 10)
             ->willReturn(array());
@@ -71,7 +72,7 @@ class FilteredPaginationTest extends TypeTestCase
             'reset'  => '',
         );
 
-        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater,$dispatcher);
+        $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
         $session            = new Session(new MockArraySessionStorage());
         $session->set(self::TEST_KEY, array('amount'=>10.00));
         $this->assertEquals(array('amount'=>10.00), $session->get(self::TEST_KEY));
@@ -91,16 +92,14 @@ class FilteredPaginationTest extends TypeTestCase
 
     public function testGetReset()
     {
-        list($queryBuilderUpdater, $paginator, $dispatcher, $entityMgr) = $this->getArguments(true);
-
-        $queryBuilderUpdater
+        $this->queryBuilderUpdater
             ->expects($this->never())
             ->method('addFilterConditions');
 
-        $query = new Query($entityMgr);
+        $query = new Query($this->entityMgr);
         $query->setDQL('SELECT s FROM NSFilteredPaginationBundle:Payment s');
 
-        $paginator->expects($this->any())
+        $this->paginator->expects($this->any())
             ->method('paginate')
             ->with($query, 1, 10)
             ->willReturn(array());
@@ -111,7 +110,7 @@ class FilteredPaginationTest extends TypeTestCase
             'reset'  => '',
         );
 
-        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater,$dispatcher);
+        $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
         $session            = new Session(new MockArraySessionStorage());
         $session->set(self::TEST_KEY, array('amount'=>10.00));
         $this->assertEquals(array('amount'=>10.00), $session->get(self::TEST_KEY));
@@ -132,18 +131,19 @@ class FilteredPaginationTest extends TypeTestCase
         $this->assertNull($form['amount']->getData());
     }
 
+    /**
+     * @group submit
+     */
     public function testSubmit()
     {
-        list($queryBuilderUpdater, $paginator, $dispatcher,$entityMgr) = $this->getArguments(true);
-
-        $queryBuilderUpdater
+        $this->queryBuilderUpdater
             ->expects($this->once())
             ->method('addFilterConditions');
 
-        $query = new Query($entityMgr);
+        $query = new Query($this->entityMgr);
         $query->setDQL('SELECT s FROM NSFilteredPaginationBundle:Payment s');
 
-        $paginator
+        $this->paginator
             ->expects($this->once())
             ->method('paginate')
             ->with($query, 1, 10)
@@ -155,16 +155,15 @@ class FilteredPaginationTest extends TypeTestCase
             'filter' => '',
         );
 
-        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater,$dispatcher);
+        $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
         $session            = new Session(new MockArraySessionStorage());
         $session->set(self::TEST_KEY, 'something');
         $this->assertEquals('something', $session->get(self::TEST_KEY));
-        $request            = new Request();
-        $request->request->set('FilteredPaginationForm', $formData);
+        $request            = new Request([], ['FilteredPaginationForm' => $formData]);
         $this->assertEquals($formData, $request->request->get('FilteredPaginationForm'));
         $request->setSession($session);
 
-        list($form, $pagination, $redirect) = $filteredPagination->process($request, 'NS\FilteredPaginationBundle\Tests\FilteredPaginationForm', $query, self::TEST_KEY);
+        list($form, $pagination, $redirect) = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY);
 
         $this->assertInstanceOf('Symfony\Component\Form\Form', $form);
         $this->assertEquals(array(), $pagination);
@@ -189,9 +188,7 @@ class FilteredPaginationTest extends TypeTestCase
 
     public function testPerPage()
     {
-        list($queryBuilderUpdater, $paginator, $dispatcher) = $this->getArguments(true);
-
-        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater,$dispatcher);
+        $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
         $session            = new Session(new MockArraySessionStorage());
         $request            = new Request();
         $request->setSession($session);
@@ -206,9 +203,7 @@ class FilteredPaginationTest extends TypeTestCase
 
     public function testRequestPerPage()
     {
-        list($queryBuilderUpdater, $paginator, $dispatcher) = $this->getArguments(true);
-
-        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater, $dispatcher);
+        $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
         $session            = new Session(new MockArraySessionStorage());
         $request            = new Request();
         $request->query->set('limit',25);
@@ -225,11 +220,9 @@ class FilteredPaginationTest extends TypeTestCase
 
     public function testSessionPerPage()
     {
-        list($queryBuilderUpdater, $paginator, $dispatcher) = $this->getArguments(true);
-
         $limitKey = self::TEST_KEY.'.limit';
 
-        $filteredPagination = new FilteredPagination($paginator, $this->factory, $queryBuilderUpdater, $dispatcher);
+        $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
         $session            = new Session(new MockArraySessionStorage());
         $session->set($limitKey,45);
 
@@ -245,40 +238,37 @@ class FilteredPaginationTest extends TypeTestCase
         $this->assertEquals(45,$session->get(self::TEST_KEY.'.limit'));
     }
 
-    private function getArguments($simpleDispatcher = false)
-    {
-        $queryBuilderUpdater = $this->getMockBuilder('\Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+    private $queryBuilderUpdater;
+    private $paginator;
+    private $entityMgr;
+    private $event;
 
-        $paginator = $this->getMockBuilder('\Knp\Component\Pager\Paginator')
-            ->disableOriginalConstructor()
-            ->getMock();
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->queryBuilderUpdater = $this->createMock(FilterBuilderUpdaterInterface::class);
+        $this->paginator = $this->createMock(Paginator::class);
 
         $config = new Configuration();
-        $entityMgr = $this->getMockBuilder('\Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityMgr->expects($this->any())
+        $this->entityMgr = $this->createMock(EntityManagerInterface::class);
+
+        $this->entityMgr->expects($this->any())
             ->method('getConfiguration')
             ->willReturn($config);
 
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->event = $this->createMock(FilterEvent::class);
 
-        if($simpleDispatcher) {
-            $event = $this->getMockBuilder('NS\FilteredPaginationBundle\Events\FilterEvent')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $this->event->expects($this->any())->method('hasNewQuery')->willReturn(false);
 
-            $event->expects($this->any())->method('hasQuery')->willReturn(false);
+        $this->dispatcher->expects($this->any())
+            ->method('dispatch')
+            ->willReturn($this->event);
+    }
 
-            $dispatcher->expects($this->any())
-                ->method('dispatch')
-                ->willReturn($event);
-        }
-
-        return array($queryBuilderUpdater,$paginator,$dispatcher, $entityMgr);
+    protected function getExtensions()
+    {
+        $type = new FilteredPaginationForm();
+        return [new PreloadedExtension([$type],[])];
     }
 }

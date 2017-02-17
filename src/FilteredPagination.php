@@ -10,6 +10,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -75,9 +76,11 @@ class FilteredPagination
      */
     public function process(Request $request, $formType, $query, $sessionKey, array $formOptions = array())
     {
+        /** @var FormTypeInterface $filterForm */
         $filterForm = $this->formFactory->create($formType, null, $formOptions);
         $method = $filterForm->getConfig()->getMethod();
-        $requestData = ($method == 'GET') ? $request->query->get($filterForm->getName()) : $request->request->get($filterForm->getName());
+        $formName = (method_exists($filterForm,'getName')) ? $filterForm->getName() : $filterForm->getBlockPrefix();
+        $requestData = ($method == 'GET') ? $request->query->get($formName) : $request->request->get($formName);
 
         if (isset($requestData['reset'])) {
             if ($method == 'POST') {
