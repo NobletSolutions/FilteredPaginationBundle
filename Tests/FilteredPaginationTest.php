@@ -8,10 +8,9 @@ use Knp\Component\Pager\Paginator;
 use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 use NS\FilteredPaginationBundle\Events\FilterEvent;
 use NS\FilteredPaginationBundle\FilteredPagination;
+use NS\FilteredPaginationBundle\Tests\BaseTypeTestCase;
 use NS\FilteredPaginationBundle\Tests\FilteredPaginationForm;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -22,7 +21,7 @@ use NS\FilteredPaginationBundle\Tests\Configuration;
  *
  * @author gnat
  */
-class FilteredPaginationTest extends TypeTestCase
+class FilteredPaginationTest extends BaseTypeTestCase
 {
     const TEST_KEY = 'filtered.pagination';
 
