@@ -12,8 +12,8 @@
     ],
 
     "require": {
-        "php":                          ">=5.3.2",
-        "symfony/symfony":              "^2.8|^3.0",
+        "php":                          ">=7.1",
+        "symfony/symfony":              "^3.0",
         "knplabs/knp-paginator-bundle": "^2.4",
         "lexik/form-filter-bundle":     "^3.0|^4.0|^5.0"
     },
