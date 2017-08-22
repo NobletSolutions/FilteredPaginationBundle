@@ -72,14 +72,14 @@ class FilteredPagination
      * @param Query $query
      * @param string $sessionKey
      * @param array $formOptions
-     * @return array
+     * @return FilteredPaginationResult
      */
     public function process(Request $request, $formType, $query, $sessionKey, array $formOptions = array())
     {
         $returnValue = $this->handleForm($request, $formType, $sessionKey, $formOptions, $query);
 
         if ($returnValue[1]) {
-            return [$returnValue[0],null,$returnValue[1]];
+            return new FilteredPaginationResult($returnValue[0], null, $returnValue[1]);
         }
 
         $page  = $request->query->get($this->knpParams['pageParameterName'], 1);
@@ -88,7 +88,7 @@ class FilteredPagination
             $query = $event->getNewQuery();
         }
 
-        return array($returnValue[0], $this->paginator->paginate($query, $page, $this->perPage, $this->knpParams), false);
+        return new FilteredPaginationResult($returnValue[0], $this->paginator->paginate($query, $page, $this->perPage, $this->knpParams), false);
     }
 
     /**
