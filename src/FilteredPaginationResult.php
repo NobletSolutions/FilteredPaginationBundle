@@ -56,7 +56,7 @@ class FilteredPaginationResult
     /**
      * @return bool|null
      */
-    public function getRedirect()
+    public function shouldRedirect()
     {
         return $this->redirect;
     }

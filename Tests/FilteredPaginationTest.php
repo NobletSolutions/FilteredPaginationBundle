@@ -49,7 +49,7 @@ class FilteredPaginationTest extends BaseTypeTestCase
         $result = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY);
         $this->assertInstanceOf('Symfony\Component\Form\Form', $result->getForm());
         $this->assertInstanceOf(PaginationInterface::class, $result->getPagination());
-        $this->assertFalse($result->getRedirect());
+        $this->assertFalse($result->shouldRedirect());
     }
 
     public function testPostReset()
@@ -83,7 +83,7 @@ class FilteredPaginationTest extends BaseTypeTestCase
         $result = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY);
         $this->assertNull($result->getPagination());
         $this->assertNotNull($result->getForm());
-        $this->assertTrue($result->getRedirect());
+        $this->assertTrue($result->shouldRedirect());
         $this->assertNull($session->get(self::TEST_KEY));
         $form = $result->getForm();
         $this->assertFalse($form->isSubmitted());
@@ -125,7 +125,7 @@ class FilteredPaginationTest extends BaseTypeTestCase
         $this->assertEquals('GET',$result->getForm()->getConfig()->getOption('method'));
         $this->assertEquals('GET',$result->getForm()->getConfig()->getMethod());
         $this->assertInstanceOf(PaginationInterface::class, $result->getPagination());
-        $this->assertFalse($result->getRedirect());
+        $this->assertFalse($result->shouldRedirect());
         $this->assertEmpty($session->get(self::TEST_KEY));
         $this->assertFalse($result->getForm()->isSubmitted());
         $this->assertNull($result->getForm()->get('amount')->getData());
@@ -167,7 +167,7 @@ class FilteredPaginationTest extends BaseTypeTestCase
 
         $this->assertInstanceOf('Symfony\Component\Form\Form', $result->getForm());
         $this->assertInstanceOf(PaginationInterface::class, $result->getPagination());
-        $this->assertFalse($result->getRedirect());
+        $this->assertFalse($result->shouldRedirect());
         $this->assertEquals($formData, $request->getSession()->get(self::TEST_KEY));
     }
 
