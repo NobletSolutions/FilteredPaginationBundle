@@ -1,4 +1,8 @@
 services:
+    NS\FilteredPaginationBundle\FilteredPagination:
+      public: false
+      arguments: [ "@knp_paginator", "@form.factory", "@lexik_form_filter.query_builder_updater", "@event_dispatcher" ]
+
     ns.filtered_pagination:
-        class: NS\FilteredPaginationBundle\FilteredPagination
-        arguments: [ "@knp_paginator", "@form.factory", "@lexik_form_filter.query_builder_updater", "@event_dispatcher" ]
+      alias: NS\FilteredPaginationBundle\FilteredPagination
+      public: true
