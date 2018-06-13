@@ -3,6 +3,7 @@ VERSION 3  RETURN OBJECT INSTEAD OF ARRAY
 =========================================
 
    Version 3.0 - Return object instead of array
+      13/06/2018 10:42  3.0.4  Allow SF4 as supported version
       25/01/2018 11:32  3.0.3  Support SF4.0
       22/08/2017 14:02  3.0.2  Require php7.1
       22/08/2017 13:41  3.0.1  Fixed getRedirect function
