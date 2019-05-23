@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: gnat
- * Date: 22/08/17
- * Time: 1:27 PM
- */
 
 namespace NS\FilteredPaginationBundle;
 
@@ -22,12 +16,6 @@ class FilteredPaginationResult
     /** @var bool|null */
     private $redirect = false;
 
-    /**
-     * FilteredPaginationResult constructor.
-     * @param FormInterface $form
-     * @param null|PaginationInterface $pagination
-     * @param null|bool $redirect
-     */
     public function __construct(FormInterface $form, ?PaginationInterface $pagination, ?bool $redirect)
     {
         $this->form = $form;
@@ -37,26 +25,17 @@ class FilteredPaginationResult
         }
     }
 
-    /**
-     * @return FormInterface
-     */
-    public function getForm()
+    public function getForm(): FormInterface
     {
         return $this->form;
     }
 
-    /**
-     * @return PaginationInterface
-     */
-    public function getPagination()
+    public function getPagination(): ?PaginationInterface
     {
         return $this->pagination;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function shouldRedirect()
+    public function shouldRedirect(): ?bool
     {
         return $this->redirect;
     }

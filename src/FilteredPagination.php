@@ -3,6 +3,7 @@
 namespace NS\FilteredPaginationBundle;
 
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Knp\Component\Pager\Paginator;
 use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 use NS\FilteredPaginationBundle\Events\FilterEvent;
@@ -13,50 +14,26 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Description of FilteredPagination
- *
- * @author gnat
- */
 class FilteredPagination
 {
-    /**
-     * @var Paginator
-     */
+    /** @var Paginator */
     private $paginator;
 
-    /**
-     * @var FormFactoryInterface
-     */
+    /** @var FormFactoryInterface */
     private $formFactory;
 
-    /**
-     * @var FilterBuilderUpdaterInterface
-     */
+    /** @var FilterBuilderUpdaterInterface */
     private $queryBuilderUpdater;
 
-    /**
-     * @var EventDispatcherInterface
-     */
+    /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $knpParams = array('pageParameterName' => 'page');
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $perPage = 10;
 
-    /**
-     *
-     * @param Paginator $pager
-     * @param FormFactoryInterface $formFactory
-     * @param FilterBuilderUpdaterInterface $queryBuilderUpdater
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(Paginator $pager, FormFactoryInterface $formFactory, FilterBuilderUpdaterInterface $queryBuilderUpdater, EventDispatcherInterface $dispatcher)
     {
         $this->paginator = $pager;
@@ -69,12 +46,12 @@ class FilteredPagination
      *
      * @param Request $request
      * @param AbstractType|string $formType
-     * @param Query $query
+     * @param Query|QueryBuilder $query
      * @param string $sessionKey
      * @param array $formOptions
      * @return FilteredPaginationResult
      */
-    public function process(Request $request, $formType, $query, $sessionKey, array $formOptions = array())
+    public function process(Request $request, $formType, $query, $sessionKey, array $formOptions = array()): FilteredPaginationResult
     {
         $returnValue = $this->handleForm($request, $formType, $sessionKey, $formOptions, $query);
 
@@ -94,21 +71,21 @@ class FilteredPagination
     /**
      * @param Request $request
      * @param $formType
-     * @param $sessionKey
+     * @param string $sessionKey
      * @param array $formOptions
-     * @param null $query
+     * @param QueryBuilder|Query|null $query
      * @return array
      */
-    public function handleForm(Request $request, $formType, $sessionKey, array $formOptions = array(), $query = null)
+    public function handleForm(Request $request, $formType, string $sessionKey, array $formOptions = array(), $query = null): array
     {
         /** @var FormTypeInterface $filterForm */
         $filterForm = $this->formFactory->create($formType, null, $formOptions);
         $method = $filterForm->getConfig()->getMethod();
-        $formName = (method_exists($filterForm,'getName')) ? $filterForm->getName() : $filterForm->getBlockPrefix();
-        $requestData = ($method == 'GET') ? $request->query->get($formName) : $request->request->get($formName);
+        $formName = method_exists($filterForm,'getName') ? $filterForm->getName() : $filterForm->getBlockPrefix();
+        $requestData = ($method === 'GET') ? $request->query->get($formName) : $request->request->get($formName);
 
         if (isset($requestData['reset'])) {
-            if ($method == 'POST') {
+            if ($method === 'POST') {
                 $request->getSession()->remove($sessionKey);
                 return array($filterForm, true);
             }
@@ -117,7 +94,7 @@ class FilteredPagination
             $requestData = array();
         }
 
-        $filterData = (empty($requestData)) ? $request->getSession()->get($sessionKey, $requestData) : $requestData;
+        $filterData = empty($requestData) ? $request->getSession()->get($sessionKey, $requestData) : $requestData;
         if (!empty($filterData)) {
             $this->applyFilter($filterForm, $filterData, $query);
             if (empty($filterData)) {
@@ -136,9 +113,9 @@ class FilteredPagination
     /**
      * @param FormInterface $form
      * @param $filterData
-     * @param $query
+     * @param Query|QueryBuilder $query
      */
-    public function applyFilter(FormInterface $form, $filterData, $query)
+    public function applyFilter(FormInterface $form, $filterData, $query): void
     {
         $form->submit($filterData);
 
@@ -149,11 +126,7 @@ class FilteredPagination
         }
     }
 
-    /**
-     * @param Request $request
-     * @param string $sessionKey
-     */
-    public function updatePerPage(Request $request, $sessionKey)
+    public function updatePerPage(Request $request, string $sessionKey): void
     {
         $limitSessionKey = sprintf('%s.limit',$sessionKey);
         if ($request->query->getInt('limit')) {
@@ -164,56 +137,36 @@ class FilteredPagination
         }
     }
 
-    /**
-     * @param int $perPage
-     * @return FilteredPagination
-     */
-    public function setPerPage($perPage)
+    public function setPerPage(int $perPage): void
     {
         $this->perPage = $perPage;
-        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getPerPage()
+    public function getPerPage(): int
     {
         return $this->perPage;
     }
 
-    /**
-     * @param array $parts
-     */
-    public function setQueryBuilderParts(array $parts)
+    public function setQueryBuilderParts(array $parts): void
     {
         $this->queryBuilderUpdater->setParts($parts);
     }
 
-    /**
-     * @return array
-     */
-    public function getKnpParams()
+    public function getKnpParams(): array
     {
         return $this->knpParams;
     }
 
-    /**
-     *
-     * @param array $knpParams
-     * @return \NS\FilteredPaginationBundle\FilteredPagination
-     */
-    public function setKnpParams(array $knpParams)
+    public function setKnpParams(array $knpParams): void
     {
         $this->knpParams = $knpParams;
-        return $this;
     }
 
     /**
-     * @param $key
-     * @param $value
+     * @param mixed $key
+     * @param mixed $value
      */
-    public function addKnpParam($key, $value)
+    public function addKnpParam($key, $value): void
     {
         $this->knpParams[$key] = $value;
     }
