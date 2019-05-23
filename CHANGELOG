@@ -3,6 +3,7 @@ VERSION 3  RETURN OBJECT INSTEAD OF ARRAY
 =========================================
 
    Version 3.0 - Return object instead of array
+      23/05/2019 08:51  3.0.7  Updated doctypes
       13/06/2018 15:18  3.0.6  fix sf4 deprecation issue
       13/06/2018 14:46  3.0.5  SF4 Release requirements
       13/06/2018 10:42  3.0.4  Allow SF4 as supported version
