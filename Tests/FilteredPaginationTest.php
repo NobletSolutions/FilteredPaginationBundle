@@ -9,20 +9,16 @@ use Knp\Component\Pager\Paginator;
 use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 use NS\FilteredPaginationBundle\Events\FilterEvent;
 use NS\FilteredPaginationBundle\FilteredPagination;
-use NS\FilteredPaginationBundle\Tests\BaseTypeTestCase;
 use NS\FilteredPaginationBundle\Tests\FilteredPaginationForm;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use NS\FilteredPaginationBundle\Tests\Configuration;
+use Symfony\Component\Form\Form;
 
-/**
- * Description of FilteredPaginationTest
- *
- * @author gnat
- */
-class FilteredPaginationTest extends BaseTypeTestCase
+class FilteredPaginationTest extends TypeTestCase
 {
     const TEST_KEY = 'filtered.pagination';
 
@@ -47,7 +43,7 @@ class FilteredPaginationTest extends BaseTypeTestCase
         $request->setSession($session);
 
         $result = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY);
-        $this->assertInstanceOf('Symfony\Component\Form\Form', $result->getForm());
+        $this->assertInstanceOf(Form::class, $result->getForm());
         $this->assertInstanceOf(PaginationInterface::class, $result->getPagination());
         $this->assertFalse($result->shouldRedirect());
     }
@@ -170,21 +166,6 @@ class FilteredPaginationTest extends BaseTypeTestCase
         $this->assertFalse($result->shouldRedirect());
         $this->assertEquals($formData, $request->getSession()->get(self::TEST_KEY));
     }
-
-//    /**
-//     * @param Request $request
-//     * @param string $sessionKey
-//     */
-//    public function updatePerPage(Request $request, $sessionKey)
-//    {
-//        $limitSessionKey = sprintf('%s.limit',$sessionKey);
-//        if ($request->request->getInt('limit')) {
-//            $this->perPage = $request->request->getInt('limit');
-//            $request->getSession()->set($limitSessionKey, $this->perPage);
-//        } elseif ($request->getSession()->has($limitSessionKey)) {
-//            $this->perPage = $request->getSession()->get($limitSessionKey,$this->perPage);
-//        }
-//    }
 
     public function testPerPage()
     {

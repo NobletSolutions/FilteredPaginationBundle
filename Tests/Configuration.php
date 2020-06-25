@@ -2,11 +2,6 @@
 
 namespace NS\FilteredPaginationBundle\Tests;
 
-/**
- * Description of Configuration
- *
- * @author gnat
- */
 class Configuration
 {
     public function getDefaultQueryHints()

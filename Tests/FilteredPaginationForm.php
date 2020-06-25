@@ -6,6 +6,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use NS\FilteredPaginationBundle\Tests\Filters\Payment;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 /**
  * Description of FilteredPaginationForm
@@ -24,38 +26,24 @@ class FilteredPaginationForm extends AbstractType
             ->setMethod($options['method'])
             ->add('date')
             ->add('amount')
-            ->add('filter', 'Symfony\Component\Form\Extension\Core\Type\SubmitType', array('attr' => array('class' => 'btn btn-sm btn-success pull-right')))
-            ->add('reset', 'Symfony\Component\Form\Extension\Core\Type\SubmitType', array('attr' => array('class' => 'btn btn-sm btn-info')))
+            ->add('filter', SubmitType::class, array('attr' => array('class' => 'btn btn-sm btn-success pull-right')))
+            ->add('reset', SubmitType::class, array('attr' => array('class' => 'btn btn-sm btn-info')))
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'NS\FilteredPaginationBundle\Tests\Filters\Payment',
+            'data_class' => Payment::class,
             'method'=>'POST',
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $this->configureOptions($resolver);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'FilteredPaginationForm';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();

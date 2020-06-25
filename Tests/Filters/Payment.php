@@ -2,19 +2,16 @@
 
 namespace NS\FilteredPaginationBundle\Tests\Filters;
 
-/**
- * Description of Payment
- *
- * @author gnat
- */
+use DateTime;
+
 class Payment
 {
+    /** @var DateTime */
     private $date;
     private $amount;
 
     /**
-     *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getDate()
     {
@@ -22,7 +19,6 @@ class Payment
     }
 
     /**
-     *
      * @return double
      */
     public function getAmount()
@@ -31,24 +27,18 @@ class Payment
     }
 
     /**
-     *
-     * @param \DateTime $date
-     * @return \NS\FilteredPaginationBundle\Tests\Filters\Payment
+     * @param DateTime $date
      */
     public function setDate($date)
     {
         $this->date = $date;
-        return $this;
     }
 
     /**
-     *
      * @param double $amount
-     * @return \NS\FilteredPaginationBundle\Tests\Filters\Payment
      */
     public function setAmount($amount)
     {
         $this->amount = $amount;
-        return $this;
     }
 }
