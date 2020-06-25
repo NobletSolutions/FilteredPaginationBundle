@@ -15,18 +15,12 @@ env:
     global:
         - TEST_COMMAND="vendor/bin/phpunit"
     matrix:
-        - SYMFONY_VERSION=^3.0 COMPOSER_MEMORY_LIMIT=-1
+        - SYMFONY_VERSION=^4.0 COMPOSER_MEMORY_LIMIT=-1
 
 matrix:
     fast_finish: true
 
     include:
-        - php: 7.2
-          env: SYMFONY_VERSION=^4.0 COMPOSER_MEMORY_LIMIT=-1
-        - php: 7.3
-          env: SYMFONY_VERSION=^4.0 COMPOSER_MEMORY_LIMIT=-1
-        - php: 7.4
-          env: SYMFONY_VERSION=^4.0 COMPOSER_MEMORY_LIMIT=-1
         - php: 7.2
           env: SYMFONY_VERSION=^5.0 COMPOSER_MEMORY_LIMIT=-1
         - php: 7.3
