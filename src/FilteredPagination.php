@@ -7,7 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use Knp\Component\Pager\Paginator;
 use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 use NS\FilteredPaginationBundle\Events\FilterEvent;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -60,7 +60,7 @@ class FilteredPagination
         }
 
         $page  = $request->query->get($this->knpParams['pageParameterName'], 1);
-        $event = $this->eventDispatcher->dispatch(FilterEvent::POST_FILTER, new FilterEvent($query));
+        $event = $this->eventDispatcher->dispatch(new FilterEvent($query), FilterEvent::POST_FILTER);
         if ($event->hasNewQuery()) {
             $query = $event->getNewQuery();
         }
@@ -120,7 +120,7 @@ class FilteredPagination
         $form->submit($filterData);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->eventDispatcher->dispatch(FilterEvent::PRE_FILTER, new FilterEvent($query));
+            $this->eventDispatcher->dispatch(new FilterEvent($query), FilterEvent::PRE_FILTER);
 
             $this->queryBuilderUpdater->addFilterConditions($form, $query);
         }

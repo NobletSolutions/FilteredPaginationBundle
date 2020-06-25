@@ -39,13 +39,8 @@ class FilteredPaginationForm extends AbstractType
         ));
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'FilteredPaginationForm';
-    }
-
-    public function getName()
-    {
-        return $this->getBlockPrefix();
     }
 }

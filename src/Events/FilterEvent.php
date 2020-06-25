@@ -4,13 +4,13 @@ namespace NS\FilteredPaginationBundle\Events;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class FilterEvent extends Event
 {
-    const PRE_FILTER = 'filtered_pagination.pre_filter';
-
-    const POST_FILTER = 'filtered_pagination.post_filter';
+    public const
+        PRE_FILTER = 'filtered_pagination.pre_filter',
+        POST_FILTER = 'filtered_pagination.post_filter';
 
     /** @var Query|QueryBuilder */
     private $orgQuery;
