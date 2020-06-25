@@ -224,7 +224,7 @@ class FilteredPaginationTest extends TypeTestCase
     private $entityMgr;
     private $event;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
