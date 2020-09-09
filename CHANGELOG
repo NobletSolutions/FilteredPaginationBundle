@@ -2,6 +2,9 @@
 VERSION 4  SF5 SUPPORT
 ======================
 
+   Version 4.1 - Add flag to notify when filtering has occurred
+      09/09/2020 09:50  4.1.0  initial release
+
    Version 4.0 - SF5 Support
       25/06/2020 14:41  4.0.0  initial release
 
