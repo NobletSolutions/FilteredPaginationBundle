@@ -15,9 +15,10 @@ _default:
     #  Apply to all branches except the one from the 'branch-specific' section
     #  Like prerequisites, you can add your own script. Example:
     #   - relative/path/to/your-own-sript.php
-    version-generator: semantic
+    version-generator: simple
     version-persister:
-        vcs-tag:  ~                        # Release with VCS tag
+        vcs-tag:
+            tag-prefix: "{branch-name}."                        # Release with VCS tag
     post-release-actions:
         vcs-publish:                       # Publish the release to the VCS
             ask-confirmation: true
