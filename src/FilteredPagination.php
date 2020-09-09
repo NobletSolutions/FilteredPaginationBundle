@@ -51,7 +51,7 @@ class FilteredPagination
      * @param array $formOptions
      * @return FilteredPaginationResult
      */
-    public function process(Request $request, $formType, $query, $sessionKey, array $formOptions = array()): FilteredPaginationResult
+    public function process(Request $request, $formType, $query, string $sessionKey, array $formOptions = array()): FilteredPaginationResult
     {
         $returnValue = $this->handleForm($request, $formType, $sessionKey, $formOptions, $query);
 
@@ -65,7 +65,7 @@ class FilteredPagination
             $query = $event->getNewQuery();
         }
 
-        return new FilteredPaginationResult($returnValue[0], $this->paginator->paginate($query, $page, $this->perPage, $this->knpParams), false);
+        return new FilteredPaginationResult($returnValue[0], $this->paginator->paginate($query, $page, $this->perPage, $this->knpParams), false, $returnValue[2]);
     }
 
     /**
@@ -94,20 +94,18 @@ class FilteredPagination
             $requestData = array();
         }
 
+        $haveData   = false;
         $filterData = empty($requestData) ? $request->getSession()->get($sessionKey, $requestData) : $requestData;
         if (!empty($filterData)) {
+            $haveData = true;
             $this->applyFilter($filterForm, $filterData, $query);
-            if (empty($filterData)) {
-                $request->getSession()->remove($sessionKey);
-            } else {
-                $request->getSession()->set($sessionKey, $filterData);
-            }
+            $request->getSession()->set($sessionKey, $filterData);
         }
 
         $this->updatePerPage($request,$sessionKey);
 
 
-        return array($filterForm, false);
+        return array($filterForm, false, $haveData);
     }
 
     /**

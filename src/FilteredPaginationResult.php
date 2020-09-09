@@ -16,13 +16,18 @@ class FilteredPaginationResult
     /** @var bool|null */
     private $redirect = false;
 
-    public function __construct(FormInterface $form, ?PaginationInterface $pagination, ?bool $redirect)
+    /** @var bool */
+    private $dataWasFiltered;
+
+    public function __construct(FormInterface $form, ?PaginationInterface $pagination, ?bool $redirect, ?bool $dataWasFiltered = false)
     {
         $this->form = $form;
         $this->pagination = $pagination;
         if ($redirect !== null) {
             $this->redirect = $redirect;
         }
+
+        $this->dataWasFiltered = $dataWasFiltered ?? false;
     }
 
     public function getForm(): FormInterface
@@ -38,5 +43,10 @@ class FilteredPaginationResult
     public function shouldRedirect(): ?bool
     {
         return $this->redirect;
+    }
+
+    public function getDataWasFiltered(): bool
+    {
+        return $this->dataWasFiltered;
     }
 }
