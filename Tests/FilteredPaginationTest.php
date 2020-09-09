@@ -46,6 +46,7 @@ class FilteredPaginationTest extends TypeTestCase
         $this->assertInstanceOf(Form::class, $result->getForm());
         $this->assertInstanceOf(PaginationInterface::class, $result->getPagination());
         $this->assertFalse($result->shouldRedirect());
+        $this->assertFalse($result->getDataWasFiltered());
     }
 
     public function testPostReset()
@@ -80,6 +81,7 @@ class FilteredPaginationTest extends TypeTestCase
         $this->assertNull($result->getPagination());
         $this->assertNotNull($result->getForm());
         $this->assertTrue($result->shouldRedirect());
+        $this->assertFalse($result->getDataWasFiltered());
         $this->assertNull($session->get(self::TEST_KEY));
         $form = $result->getForm();
         $this->assertFalse($form->isSubmitted());
@@ -116,10 +118,12 @@ class FilteredPaginationTest extends TypeTestCase
         $request->setSession($session);
 
         $result = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY, array('method'=>'GET'));
+        $this->assertFalse($result->getDataWasFiltered());
 
         $this->assertNotNull($result->getForm());
-        $this->assertEquals('GET',$result->getForm()->getConfig()->getOption('method'));
-        $this->assertEquals('GET',$result->getForm()->getConfig()->getMethod());
+        $formConfig = $result->getForm()->getConfig();
+        $this->assertEquals('GET', $formConfig->getOption('method'));
+        $this->assertEquals('GET', $formConfig->getMethod());
         $this->assertInstanceOf(PaginationInterface::class, $result->getPagination());
         $this->assertFalse($result->shouldRedirect());
         $this->assertEmpty($session->get(self::TEST_KEY));
@@ -160,6 +164,7 @@ class FilteredPaginationTest extends TypeTestCase
         $request->setSession($session);
 
         $result = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY);
+        $this->assertTrue($result->getDataWasFiltered());
 
         $this->assertInstanceOf('Symfony\Component\Form\Form', $result->getForm());
         $this->assertInstanceOf(PaginationInterface::class, $result->getPagination());
