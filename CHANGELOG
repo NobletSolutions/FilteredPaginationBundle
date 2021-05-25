@@ -2,6 +2,9 @@
 VERSION 4  SF5 SUPPORT
 ======================
 
+   Version 4.2 - Added FilteredPaginationInterface
+      25/05/2021 17:04  4.2.0  initial release
+
    Version 4.1 - Add flag to notify when filtering has occurred
       01/01/2021 04:48  4.1.1  Minor typehint tweak
       09/09/2020 09:50  4.1.0  initial release
