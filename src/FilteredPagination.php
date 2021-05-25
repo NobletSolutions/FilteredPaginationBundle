@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class FilteredPagination
+class FilteredPagination implements FilteredPaginationInterface
 {
     /** @var PaginatorInterface */
     private $paginator;
