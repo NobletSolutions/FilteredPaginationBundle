@@ -1,38 +1,37 @@
 <?php
 
-namespace NS\FilteredPaginationBundle\Tests\Pagination;
+namespace NS\FilteredPaginationBundle\Tests;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Knp\Component\Pager\Pagination\PaginationInterface;
-use Knp\Component\Pager\Paginator;
+use Knp\Component\Pager\PaginatorInterface;
 use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 use NS\FilteredPaginationBundle\Events\FilterEvent;
 use NS\FilteredPaginationBundle\FilteredPagination;
-use NS\FilteredPaginationBundle\Tests\FilteredPaginationForm;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use NS\FilteredPaginationBundle\Tests\Configuration;
-use Symfony\Component\Form\Form;
 
 class FilteredPaginationTest extends TypeTestCase
 {
     const TEST_KEY = 'filtered.pagination';
 
-    public function testEmpty()
+    public function testEmpty(): void
     {
         $this->queryBuilderUpdater
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('addFilterConditions');
 
         $query = new Query($this->entityMgr);
         $query->setDQL('SELECT s FROM NSFilteredPaginationBundle:Payment s');
 
         $this->paginator
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('paginate')
             ->with($query, 1, 10)
             ->willReturn($this->createMock(PaginationInterface::class));
@@ -43,185 +42,223 @@ class FilteredPaginationTest extends TypeTestCase
         $request->setSession($session);
 
         $result = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY);
-        $this->assertInstanceOf(Form::class, $result->getForm());
-        $this->assertInstanceOf(PaginationInterface::class, $result->getPagination());
-        $this->assertFalse($result->shouldRedirect());
-        $this->assertFalse($result->getDataWasFiltered());
+        self::assertInstanceOf(Form::class, $result->getForm());
+        self::assertInstanceOf(PaginationInterface::class, $result->getPagination());
+        self::assertFalse($result->shouldRedirect());
+        self::assertFalse($result->getDataWasFiltered());
     }
 
-    public function testPostReset()
+    public function testPostReset(): void
     {
         $this->queryBuilderUpdater
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('addFilterConditions');
 
         $query = new Query($this->entityMgr);
         $query->setDQL('SELECT s FROM NSFilteredPaginationBundle:Payment s');
 
-        $this->paginator->expects($this->never())
+        $this->paginator->expects(self::never())
             ->method('paginate')
             ->with($query, 1, 10);
 
-        $formData = array(
+        $formData = [
             'date'   => '',
             'amount' => '',
             'reset'  => '',
-        );
+        ];
 
         $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
         $session            = new Session(new MockArraySessionStorage());
-        $session->set(self::TEST_KEY, array('amount'=>10.00));
-        $this->assertEquals(array('amount'=>10.00), $session->get(self::TEST_KEY));
-        $request            = new Request();
+        $session->set(self::TEST_KEY, ['amount' => 10.00]);
+        self::assertEquals(['amount' => 10.00], $session->get(self::TEST_KEY));
+        $request = new Request();
         $request->request->set('FilteredPaginationForm', $formData);
-        $this->assertEquals($formData, $request->request->get('FilteredPaginationForm'));
+        self::assertEquals($formData, $request->request->get('FilteredPaginationForm'));
         $request->setSession($session);
 
         $result = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY);
-        $this->assertNull($result->getPagination());
-        $this->assertNotNull($result->getForm());
-        $this->assertTrue($result->shouldRedirect());
-        $this->assertFalse($result->getDataWasFiltered());
-        $this->assertNull($session->get(self::TEST_KEY));
+        self::assertNull($result->getPagination());
+        self::assertNotNull($result->getForm());
+        self::assertTrue($result->shouldRedirect());
+        self::assertFalse($result->getDataWasFiltered());
+        self::assertNull($session->get(self::TEST_KEY));
         $form = $result->getForm();
-        $this->assertFalse($form->isSubmitted());
-        $this->assertNull($form['amount']->getData());
+        self::assertFalse($form->isSubmitted());
+        self::assertNull($form['amount']->getData());
     }
 
-    public function testGetReset()
+    public function testGetReset(): void
     {
         $this->queryBuilderUpdater
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('addFilterConditions');
 
         $query = new Query($this->entityMgr);
         $query->setDQL('SELECT s FROM NSFilteredPaginationBundle:Payment s');
 
-        $this->paginator->expects($this->any())
+        $this->paginator
             ->method('paginate')
             ->with($query, 1, 10)
             ->willReturn($this->createMock(PaginationInterface::class));
 
-        $formData = array(
+        $formData = [
             'date'   => '',
             'amount' => 10.00,
             'reset'  => '',
-        );
+        ];
 
         $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
         $session            = new Session(new MockArraySessionStorage());
-        $session->set(self::TEST_KEY, array('amount'=>10.00));
-        $this->assertEquals(array('amount'=>10.00), $session->get(self::TEST_KEY));
-        $request            = new Request();
+        $session->set(self::TEST_KEY, ['amount' => 10.00]);
+        self::assertEquals(['amount' => 10.00], $session->get(self::TEST_KEY));
+        $request = new Request();
         $request->query->set('FilteredPaginationForm', $formData);
-        $this->assertEquals($formData, $request->query->get('FilteredPaginationForm'));
+        self::assertEquals($formData, $request->query->get('FilteredPaginationForm'));
         $request->setSession($session);
 
-        $result = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY, array('method'=>'GET'));
-        $this->assertFalse($result->getDataWasFiltered());
+        $result = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY, ['method' => 'GET']);
+        self::assertFalse($result->getDataWasFiltered());
 
-        $this->assertNotNull($result->getForm());
+        self::assertNotNull($result->getForm());
         $formConfig = $result->getForm()->getConfig();
-        $this->assertEquals('GET', $formConfig->getOption('method'));
-        $this->assertEquals('GET', $formConfig->getMethod());
-        $this->assertInstanceOf(PaginationInterface::class, $result->getPagination());
-        $this->assertFalse($result->shouldRedirect());
-        $this->assertEmpty($session->get(self::TEST_KEY));
-        $this->assertFalse($result->getForm()->isSubmitted());
-        $this->assertNull($result->getForm()->get('amount')->getData());
+        self::assertEquals('GET', $formConfig->getOption('method'));
+        self::assertEquals('GET', $formConfig->getMethod());
+        self::assertInstanceOf(PaginationInterface::class, $result->getPagination());
+        self::assertFalse($result->shouldRedirect());
+        self::assertEmpty($session->get(self::TEST_KEY));
+        self::assertFalse($result->getForm()->isSubmitted());
+        self::assertNull($result->getForm()->get('amount')->getData());
     }
 
     /**
      * @group submit
      */
-    public function testSubmit()
+    public function testSubmit(): void
     {
         $this->queryBuilderUpdater
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('addFilterConditions');
 
         $query = new Query($this->entityMgr);
         $query->setDQL('SELECT s FROM NSFilteredPaginationBundle:Payment s');
 
         $this->paginator
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('paginate')
             ->with($query, 1, 10)
             ->willReturn($this->createMock(PaginationInterface::class));
 
-        $formData = array(
+        $formData = [
             'date'   => '',
             'amount' => '12.30',
             'filter' => '',
-        );
+        ];
 
         $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
         $session            = new Session(new MockArraySessionStorage());
         $session->set(self::TEST_KEY, 'something');
-        $this->assertEquals('something', $session->get(self::TEST_KEY));
-        $request            = new Request([], ['FilteredPaginationForm' => $formData]);
-        $this->assertEquals($formData, $request->request->get('FilteredPaginationForm'));
+        self::assertEquals('something', $session->get(self::TEST_KEY));
+        $request = new Request([], ['FilteredPaginationForm' => $formData]);
+        self::assertEquals($formData, $request->request->get('FilteredPaginationForm'));
         $request->setSession($session);
 
         $result = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY);
-        $this->assertTrue($result->getDataWasFiltered());
+        self::assertTrue($result->getDataWasFiltered());
 
-        $this->assertInstanceOf('Symfony\Component\Form\Form', $result->getForm());
-        $this->assertInstanceOf(PaginationInterface::class, $result->getPagination());
-        $this->assertFalse($result->shouldRedirect());
-        $this->assertEquals($formData, $request->getSession()->get(self::TEST_KEY));
+        self::assertInstanceOf(PaginationInterface::class, $result->getPagination());
+        self::assertFalse($result->shouldRedirect());
+        self::assertEquals($formData, $request->getSession()->get(self::TEST_KEY));
     }
 
-    public function testPerPage()
+    /**
+     * @group submit
+     */
+    public function testSubmitPastPage1WillRedirect(): void
+    {
+        $this->queryBuilderUpdater
+            ->expects(self::once())
+            ->method('addFilterConditions');
+
+        $query = new Query($this->entityMgr);
+        $query->setDQL('SELECT s FROM NSFilteredPaginationBundle:Payment s');
+
+        $this->paginator
+            ->expects(self::never())
+            ->method('paginate');
+
+        $formData = [
+            'date'   => '',
+            'amount' => '12.30',
+            'filter' => '',
+        ];
+
+        $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
+        $session            = new Session(new MockArraySessionStorage());
+        $session->set(self::TEST_KEY, 'something');
+        self::assertEquals('something', $session->get(self::TEST_KEY));
+        $request = new Request(['page' => 3], ['FilteredPaginationForm' => $formData]);
+        self::assertEquals($formData, $request->request->get('FilteredPaginationForm'));
+        $request->setSession($session);
+
+        $result = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY);
+        self::assertTrue($result->getDataWasFiltered());
+        self::assertTrue($result->shouldRedirect());
+
+        self::assertNull($result->getPagination());
+        self::asserttrue($result->shouldRedirect());
+        self::assertEquals($formData, $request->getSession()->get(self::TEST_KEY));
+    }
+
+    public function testPerPage(): void
     {
         $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
         $session            = new Session(new MockArraySessionStorage());
         $request            = new Request();
         $request->setSession($session);
 
-        $this->assertEquals(10,$filteredPagination->getPerPage());
-        $this->assertFalse($session->has(self::TEST_KEY.'-limit'));
+        self::assertEquals(10, $filteredPagination->getPerPage());
+        self::assertFalse($session->has(self::TEST_KEY . '-limit'));
 
-        $filteredPagination->updatePerPage($request,self::TEST_KEY);
-        $this->assertEquals(10,$filteredPagination->getPerPage());
-        $this->assertFalse($session->has(self::TEST_KEY.'-limit'));
+        $filteredPagination->updatePerPage($request, self::TEST_KEY);
+        self::assertEquals(10, $filteredPagination->getPerPage());
+        self::assertFalse($session->has(self::TEST_KEY . '-limit'));
     }
 
-    public function testRequestPerPage()
+    public function testRequestPerPage(): void
     {
         $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
         $session            = new Session(new MockArraySessionStorage());
         $request            = new Request();
-        $request->query->set('limit',25);
+        $request->query->set('limit', 25);
         $request->setSession($session);
 
-        $this->assertEquals(10,$filteredPagination->getPerPage());
-        $this->assertFalse($session->has(self::TEST_KEY.'.limit'));
+        self::assertEquals(10, $filteredPagination->getPerPage());
+        self::assertFalse($session->has(self::TEST_KEY . '.limit'));
 
-        $filteredPagination->updatePerPage($request,self::TEST_KEY);
-        $this->assertEquals(25,$filteredPagination->getPerPage());
-        $this->assertTrue($session->has(self::TEST_KEY.'.limit'));
-        $this->assertEquals(25,$session->get(self::TEST_KEY.'.limit'));
+        $filteredPagination->updatePerPage($request, self::TEST_KEY);
+        self::assertEquals(25, $filteredPagination->getPerPage());
+        self::assertTrue($session->has(self::TEST_KEY . '.limit'));
+        self::assertEquals(25, $session->get(self::TEST_KEY . '.limit'));
     }
 
-    public function testSessionPerPage()
+    public function testSessionPerPage(): void
     {
-        $limitKey = self::TEST_KEY.'.limit';
+        $limitKey = self::TEST_KEY . '.limit';
 
         $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
         $session            = new Session(new MockArraySessionStorage());
-        $session->set($limitKey,45);
+        $session->set($limitKey, 45);
 
-        $request            = new Request();
+        $request = new Request();
         $request->setSession($session);
 
-        $this->assertEquals(10,$filteredPagination->getPerPage());
-        $this->assertTrue($session->has(self::TEST_KEY.'.limit'));
+        self::assertEquals(10, $filteredPagination->getPerPage());
+        self::assertTrue($session->has(self::TEST_KEY . '.limit'));
 
-        $filteredPagination->updatePerPage($request,self::TEST_KEY);
-        $this->assertEquals(45,$filteredPagination->getPerPage());
-        $this->assertTrue($session->has(self::TEST_KEY.'.limit'));
-        $this->assertEquals(45,$session->get(self::TEST_KEY.'.limit'));
+        $filteredPagination->updatePerPage($request, self::TEST_KEY);
+        self::assertEquals(45, $filteredPagination->getPerPage());
+        self::assertTrue($session->has(self::TEST_KEY . '.limit'));
+        self::assertEquals(45, $session->get(self::TEST_KEY . '.limit'));
     }
 
     private $queryBuilderUpdater;
@@ -234,20 +271,20 @@ class FilteredPaginationTest extends TypeTestCase
         parent::setUp();
 
         $this->queryBuilderUpdater = $this->createMock(FilterBuilderUpdaterInterface::class);
-        $this->paginator = $this->createMock(Paginator::class);
+        $this->paginator           = $this->createMock(PaginatorInterface::class);
 
-        $config = new Configuration();
+        $config          = new Configuration();
         $this->entityMgr = $this->createMock(EntityManagerInterface::class);
 
-        $this->entityMgr->expects($this->any())
+        $this->entityMgr
             ->method('getConfiguration')
             ->willReturn($config);
 
         $this->event = $this->createMock(FilterEvent::class);
 
-        $this->event->expects($this->any())->method('hasNewQuery')->willReturn(false);
+        $this->event->method('hasNewQuery')->willReturn(false);
 
-        $this->dispatcher->expects($this->any())
+        $this->dispatcher
             ->method('dispatch')
             ->willReturn($this->event);
     }
@@ -255,6 +292,6 @@ class FilteredPaginationTest extends TypeTestCase
     protected function getExtensions()
     {
         $type = new FilteredPaginationForm();
-        return [new PreloadedExtension([$type],[])];
+        return [new PreloadedExtension([$type], [])];
     }
 }

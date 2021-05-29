@@ -7,12 +7,12 @@ use Doctrine\ORM\QueryBuilder;
 use Knp\Component\Pager\PaginatorInterface;
 use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 use NS\FilteredPaginationBundle\Events\FilterEvent;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class FilteredPagination implements FilteredPaginationInterface
 {
@@ -57,7 +57,7 @@ class FilteredPagination implements FilteredPaginationInterface
         $returnValue = $this->handleForm($request, $formType, $sessionKey, $formOptions, $query);
 
         if ($returnValue[1]) {
-            return new FilteredPaginationResult($returnValue[0], null, $returnValue[1]);
+            return new FilteredPaginationResult($returnValue[0], null, $returnValue[1], $returnValue[2] ?? false);
         }
 
         $page  = $request->query->get($this->knpParams['pageParameterName'], 1);
@@ -96,8 +96,13 @@ class FilteredPagination implements FilteredPaginationInterface
             $requestData = [];
         }
 
-        $haveData   = false;
-        $filterData = empty($requestData) ? $request->getSession()->get($sessionKey, $requestData) : $requestData;
+        $haveData       = false;
+        $page           = $request->query->get('page');
+        /**
+         * If we have data and are on a page past page 1 we need to redirect back in case we're past the end of the number of pages of data/results
+         */
+        $shouldRedirect = !empty($requestData) && $page && $page > 1;
+        $filterData     = empty($requestData) ? $request->getSession()->get($sessionKey, $requestData) : $requestData;
         if (!empty($filterData)) {
             $haveData = true;
             $this->applyFilter($filterForm, $filterData, $query);
@@ -107,7 +112,7 @@ class FilteredPagination implements FilteredPaginationInterface
         $this->updatePerPage($request, $sessionKey);
 
 
-        return [$filterForm, false, $haveData];
+        return [$filterForm, $shouldRedirect, $haveData];
     }
 
     /**
