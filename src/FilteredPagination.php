@@ -56,7 +56,7 @@ class FilteredPagination
         $returnValue = $this->handleForm($request, $formType, $sessionKey, $formOptions, $query);
 
         if ($returnValue[1]) {
-            return new FilteredPaginationResult($returnValue[0], null, $returnValue[1]);
+            return new FilteredPaginationResult($returnValue[0], null, $returnValue[1], $returnValue[2] ?? false);
         }
 
         $page  = $request->query->get($this->knpParams['pageParameterName'], 1);
@@ -95,6 +95,12 @@ class FilteredPagination
         }
 
         $haveData   = false;
+        $page           = $request->query->get('page');
+        /**
+         * If we have data and are on a page past page 1 we need to redirect back in case we're past the end of the number of pages of data/results
+         */
+        $shouldRedirect = !empty($requestData) && $page && $page > 1;
+
         $filterData = empty($requestData) ? $request->getSession()->get($sessionKey, $requestData) : $requestData;
         if (!empty($filterData)) {
             $haveData = true;
@@ -105,7 +111,7 @@ class FilteredPagination
         $this->updatePerPage($request,$sessionKey);
 
 
-        return array($filterForm, false, $haveData);
+        return array($filterForm, $shouldRedirect, $haveData);
     }
 
     /**

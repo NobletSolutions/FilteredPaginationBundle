@@ -176,6 +176,45 @@ class FilteredPaginationTest extends BaseTypeTestCase
         $this->assertEquals($formData, $request->getSession()->get(self::TEST_KEY));
     }
 
+    /**
+     * @group submit
+     */
+    public function testSubmitPastPage1ShouldRedirect()
+    {
+        $this->queryBuilderUpdater
+            ->expects($this->once())
+            ->method('addFilterConditions');
+
+        $query = new Query($this->entityMgr);
+        $query->setDQL('SELECT s FROM NSFilteredPaginationBundle:Payment s');
+
+        $this->paginator
+            ->expects($this->never())
+            ->method('paginate');
+
+        $formData = array(
+            'date'   => '',
+            'amount' => '12.30',
+            'filter' => '',
+        );
+
+        $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
+        $session            = new Session(new MockArraySessionStorage());
+        $session->set(self::TEST_KEY, 'something');
+        $this->assertEquals('something', $session->get(self::TEST_KEY));
+        $request            = new Request(['page' => 3], ['FilteredPaginationForm' => $formData]);
+        $this->assertEquals($formData, $request->request->get('FilteredPaginationForm'));
+        $request->setSession($session);
+
+        $result = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY);
+        $this->assertTrue($result->getDataWasFiltered());
+        $this->assertTrue($result->shouldRedirect());
+
+        $this->assertNull($result->getPagination());
+        $this->assertTrue($result->shouldRedirect());
+        $this->assertEquals($formData, $request->getSession()->get(self::TEST_KEY));
+    }
+
 //    /**
 //     * @param Request $request
 //     * @param string $sessionKey
