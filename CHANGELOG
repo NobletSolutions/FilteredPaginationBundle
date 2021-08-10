@@ -3,6 +3,7 @@ VERSION 4  SF5 SUPPORT
 ======================
 
    Version 4.2 - Added FilteredPaginationInterface
+      10/08/2021 15:19  4.2.2  Adjusted return values from handleForm method
       28/05/2021 20:39  4.2.1  Redirect when filtering data on a page past 1
       25/05/2021 17:04  4.2.0  initial release
 
