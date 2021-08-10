@@ -89,7 +89,7 @@ class FilteredPagination implements FilteredPaginationInterface
         if (isset($requestData['reset'])) {
             if ($method === 'POST') {
                 $request->getSession()->remove($sessionKey);
-                return [$filterForm, true];
+                return [$filterForm, true, false];
             }
 
             $request->getSession()->set($sessionKey, []);
