@@ -73,7 +73,7 @@ class FilteredPaginationTest extends TypeTestCase
         self::assertEquals(['amount' => 10.00], $session->get(self::TEST_KEY));
         $request = new Request();
         $request->request->set('FilteredPaginationForm', $formData);
-        self::assertEquals($formData, $request->request->get('FilteredPaginationForm'));
+        self::assertEquals($formData, $request->request->all('FilteredPaginationForm'));
         $request->setSession($session);
 
         $result = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY);
@@ -113,7 +113,7 @@ class FilteredPaginationTest extends TypeTestCase
         self::assertEquals(['amount' => 10.00], $session->get(self::TEST_KEY));
         $request = new Request();
         $request->query->set('FilteredPaginationForm', $formData);
-        self::assertEquals($formData, $request->query->get('FilteredPaginationForm'));
+        self::assertEquals($formData, $request->query->all('FilteredPaginationForm'));
         $request->setSession($session);
 
         $result = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY, ['method' => 'GET']);
@@ -159,7 +159,7 @@ class FilteredPaginationTest extends TypeTestCase
         $session->set(self::TEST_KEY, 'something');
         self::assertEquals('something', $session->get(self::TEST_KEY));
         $request = new Request([], ['FilteredPaginationForm' => $formData]);
-        self::assertEquals($formData, $request->request->get('FilteredPaginationForm'));
+        self::assertEquals($formData, $request->request->all('FilteredPaginationForm'));
         $request->setSession($session);
 
         $result = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY);
@@ -197,7 +197,7 @@ class FilteredPaginationTest extends TypeTestCase
         $session->set(self::TEST_KEY, 'something');
         self::assertEquals('something', $session->get(self::TEST_KEY));
         $request = new Request(['page' => 3], ['FilteredPaginationForm' => $formData]);
-        self::assertEquals($formData, $request->request->get('FilteredPaginationForm'));
+        self::assertEquals($formData, $request->request->all('FilteredPaginationForm'));
         $request->setSession($session);
 
         $result = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY);

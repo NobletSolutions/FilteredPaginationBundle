@@ -84,7 +84,7 @@ class FilteredPagination implements FilteredPaginationInterface
         $filterForm  = $this->formFactory->create($formType, null, $formOptions);
         $method      = $filterForm->getConfig()->getMethod();
         $formName    = method_exists($filterForm, 'getName') ? $filterForm->getName() : $filterForm->getBlockPrefix();
-        $requestData = ($method === 'GET') ? $request->query->get($formName) : $request->request->get($formName);
+        $requestData = ($method === 'GET') ? $request->query->all($formName) : $request->request->all($formName);
 
         if (isset($requestData['reset'])) {
             if ($method === 'POST') {
