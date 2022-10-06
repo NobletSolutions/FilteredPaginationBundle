@@ -2,6 +2,9 @@
 VERSION 4  SF5 SUPPORT
 ======================
 
+   Version 4.3 - Allow SF6/PHP81
+      05/10/2022 23:05  4.3.0  initial release
+
    Version 4.2 - Added FilteredPaginationInterface
       20/10/2021 23:29  4.2.3  Removed deprecated sf calls
       10/08/2021 15:19  4.2.2  Adjusted return values from handleForm method
