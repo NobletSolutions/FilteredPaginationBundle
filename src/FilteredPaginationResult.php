@@ -7,17 +7,13 @@ use Symfony\Component\Form\FormInterface;
 
 class FilteredPaginationResult
 {
-    /** @var FormInterface */
-    private $form;
+    private FormInterface $form;
 
-    /** @var PaginationInterface */
-    private $pagination;
+    private ?PaginationInterface $pagination = null;
 
-    /** @var bool|null */
-    private $redirect = false;
+    private bool $redirect = false;
 
-    /** @var bool */
-    private $dataWasFiltered;
+    private bool $dataWasFiltered = false;
 
     public function __construct(FormInterface $form, ?PaginationInterface $pagination, ?bool $redirect, ?bool $dataWasFiltered = false)
     {
@@ -27,7 +23,9 @@ class FilteredPaginationResult
             $this->redirect = $redirect;
         }
 
-        $this->dataWasFiltered = $dataWasFiltered ?? false;
+        if ($dataWasFiltered !== null) {
+            $this->dataWasFiltered = $dataWasFiltered;
+        }
     }
 
     public function getForm(): FormInterface

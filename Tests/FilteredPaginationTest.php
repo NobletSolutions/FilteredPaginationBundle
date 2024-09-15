@@ -6,11 +6,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
-use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 use NS\FilteredPaginationBundle\Events\FilterEvent;
 use NS\FilteredPaginationBundle\FilteredPagination;
+use PHPUnit\Framework\MockObject\MockObject;
+use Spiriit\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 class FilteredPaginationTest extends TypeTestCase
 {
-    const TEST_KEY = 'filtered.pagination';
+    const string TEST_KEY = 'filtered.pagination';
 
     public function testEmpty(): void
     {
@@ -261,10 +261,10 @@ class FilteredPaginationTest extends TypeTestCase
         self::assertEquals(45, $session->get(self::TEST_KEY . '.limit'));
     }
 
-    private $queryBuilderUpdater;
-    private $paginator;
-    private $entityMgr;
-    private $event;
+    private FilterBuilderUpdaterInterface|MockObject $queryBuilderUpdater;
+    private PaginationInterface|MockObject $paginator;
+    private EntityManagerInterface|MockObject $entityMgr;
+    private FilterEvent|MockObject $event;
 
     protected function setUp(): void
     {
@@ -289,7 +289,7 @@ class FilteredPaginationTest extends TypeTestCase
             ->willReturn($this->event);
     }
 
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $type = new FilteredPaginationForm();
         return [new PreloadedExtension([$type], [])];

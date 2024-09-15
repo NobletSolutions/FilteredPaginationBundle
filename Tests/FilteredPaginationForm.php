@@ -20,23 +20,22 @@ class FilteredPaginationForm extends AbstractType
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->setMethod($options['method'])
             ->add('date')
             ->add('amount')
-            ->add('filter', SubmitType::class, array('attr' => array('class' => 'btn btn-sm btn-success pull-right')))
-            ->add('reset', SubmitType::class, array('attr' => array('class' => 'btn btn-sm btn-info')))
-        ;
+            ->add('filter', SubmitType::class, ['attr' => ['class' => 'btn btn-sm btn-success pull-right']])
+            ->add('reset', SubmitType::class, ['attr' => ['class' => 'btn btn-sm btn-info']]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'data_class' => Payment::class,
-            'method'=>'POST',
-        ));
+            'method'     => 'POST',
+        ]);
     }
 
     public function getBlockPrefix(): string

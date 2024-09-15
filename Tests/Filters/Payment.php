@@ -6,14 +6,10 @@ use DateTime;
 
 class Payment
 {
-    /** @var DateTime */
-    private $date;
+    private DateTime $date;
     private $amount;
 
-    /**
-     * @return DateTime
-     */
-    public function getDate()
+    public function getDate(): DateTime
     {
         return $this->date;
     }
@@ -26,10 +22,7 @@ class Payment
         return $this->amount;
     }
 
-    /**
-     * @param DateTime $date
-     */
-    public function setDate($date)
+    public function setDate(DateTime $date): void
     {
         $this->date = $date;
     }
@@ -37,7 +30,7 @@ class Payment
     /**
      * @param double $amount
      */
-    public function setAmount($amount)
+    public function setAmount($amount): void
     {
         $this->amount = $amount;
     }

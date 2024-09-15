@@ -5,8 +5,8 @@ namespace NS\FilteredPaginationBundle;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Knp\Component\Pager\PaginatorInterface;
-use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 use NS\FilteredPaginationBundle\Events\FilterEvent;
+use Spiriit\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -16,23 +16,17 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class FilteredPagination implements FilteredPaginationInterface
 {
-    /** @var PaginatorInterface */
-    private $paginator;
+    private PaginatorInterface $paginator;
 
-    /** @var FormFactoryInterface */
-    private $formFactory;
+    private FormFactoryInterface $formFactory;
 
-    /** @var FilterBuilderUpdaterInterface */
-    private $queryBuilderUpdater;
+    private FilterBuilderUpdaterInterface $queryBuilderUpdater;
 
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
+    private EventDispatcherInterface $eventDispatcher;
 
-    /** @var array */
-    private $knpParams = ['pageParameterName' => 'page'];
+    private array $knpParams = ['pageParameterName' => 'page'];
 
-    /** @var int */
-    private $perPage = 10;
+    private int $perPage = 10;
 
     public function __construct(PaginatorInterface $pager, FormFactoryInterface $formFactory, FilterBuilderUpdaterInterface $queryBuilderUpdater, EventDispatcherInterface $dispatcher)
     {
@@ -42,17 +36,7 @@ class FilteredPagination implements FilteredPaginationInterface
         $this->eventDispatcher     = $dispatcher;
     }
 
-    /**
-     *
-     * @param Request             $request
-     * @param AbstractType|string $formType
-     * @param Query|QueryBuilder  $query
-     * @param string              $sessionKey
-     * @param array               $formOptions
-     *
-     * @return FilteredPaginationResult
-     */
-    public function process(Request $request, $formType, $query, string $sessionKey, array $formOptions = []): FilteredPaginationResult
+    public function process(Request $request, AbstractType|string $formType, Query|QueryBuilder $query, string $sessionKey, array $formOptions = []): FilteredPaginationResult
     {
         $returnValue = $this->handleForm($request, $formType, $sessionKey, $formOptions, $query);
 
@@ -69,18 +53,9 @@ class FilteredPagination implements FilteredPaginationInterface
         return new FilteredPaginationResult($returnValue[0], $this->paginator->paginate($query, $page, $this->perPage, $this->knpParams), false, $returnValue[2]);
     }
 
-    /**
-     * @param Request                 $request
-     * @param                         $formType
-     * @param string                  $sessionKey
-     * @param array                   $formOptions
-     * @param QueryBuilder|Query|null $query
-     *
-     * @return array
-     */
-    public function handleForm(Request $request, $formType, string $sessionKey, array $formOptions = [], $query = null): array
+    public function handleForm(Request $request, AbstractType|string $formType, string $sessionKey, array $formOptions = [], Query|QueryBuilder|null $query = null): array
     {
-        /** @var FormTypeInterface $filterForm */
+        /** @var FormInterface|FormTypeInterface $filterForm */
         $filterForm  = $this->formFactory->create($formType, null, $formOptions);
         $method      = $filterForm->getConfig()->getMethod();
         $formName    = method_exists($filterForm, 'getName') ? $filterForm->getName() : $filterForm->getBlockPrefix();
@@ -115,12 +90,7 @@ class FilteredPagination implements FilteredPaginationInterface
         return [$filterForm, $shouldRedirect, $haveData];
     }
 
-    /**
-     * @param FormInterface      $form
-     * @param                    $filterData
-     * @param Query|QueryBuilder $query
-     */
-    public function applyFilter(FormInterface $form, $filterData, $query): void
+    public function applyFilter(FormInterface $form, $filterData, Query|QueryBuilder $query): void
     {
         $form->submit($filterData);
 

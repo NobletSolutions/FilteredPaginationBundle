@@ -8,28 +8,20 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class FilterEvent extends Event
 {
-    public const
+    public const string
         PRE_FILTER = 'filtered_pagination.pre_filter',
         POST_FILTER = 'filtered_pagination.post_filter';
 
-    /** @var Query|QueryBuilder */
-    private $orgQuery;
+    private Query|QueryBuilder $orgQuery;
 
-    /** @var Query|QueryBuilder */
-    private $newQuery;
+    private null|Query|QueryBuilder $newQuery = null;
 
-    /**
-     * @param Query|QueryBuilder $orgQuery
-     */
-    public function __construct($orgQuery)
+    public function __construct(Query|QueryBuilder $orgQuery)
     {
         $this->orgQuery = $orgQuery;
     }
 
-    /**
-     * @return Query|QueryBuilder
-     */
-    public function getOriginalQuery()
+    public function getOriginalQuery(): Query|QueryBuilder
     {
         return $this->orgQuery;
     }
@@ -39,18 +31,12 @@ class FilterEvent extends Event
         return $this->newQuery !== null;
     }
 
-    /**
-     * @return Query|QueryBuilder
-     */
-    public function getNewQuery()
+    public function getNewQuery(): null|Query|QueryBuilder
     {
         return $this->newQuery;
     }
 
-    /**
-     * @param Query|QueryBuilder $query
-     */
-    public function setNewQuery($query): void
+    public function setNewQuery(Query|QueryBuilder $query): void
     {
         $this->newQuery = $query;
     }

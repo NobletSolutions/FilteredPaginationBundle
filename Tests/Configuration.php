@@ -2,14 +2,14 @@
 
 namespace NS\FilteredPaginationBundle\Tests;
 
-class Configuration
+class Configuration extends \Doctrine\ORM\Configuration
 {
-    public function getDefaultQueryHints()
+    public function getDefaultQueryHints(): array
     {
         return array();
     }
 
-    public function isSecondLevelCacheEnabled()
+    public function isSecondLevelCacheEnabled(): bool
     {
         return false;
     }
