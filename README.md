@@ -7,13 +7,13 @@ Edit AppKernel.php and add the bundle
 
     ...
     new Knp\Bundle\PaginatorBundle\KnpPaginatorBundle(),
-    new Lexik\Bundle\FormFilterBundle\LexikFormFilterBundle(),
+    new Spiriit\Bundle\FormFilterBundle\SpiriitFormFilterBundle(),
     new NS\FilteredPaginationBundle\NSFilteredPaginationBundle(),
 
 Usage
 ============
 
-In a controller you request the filtered pagination bundle.
+In a controller, inject  you request the filtered pagination bundle.
 
     $query             = $this->get('doctrine.orm.entity_manager')->getRepository('...')->getSomeQuery();
     $filteredPaginator = $this->get('ns.filtered_pagination');

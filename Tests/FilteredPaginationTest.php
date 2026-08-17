@@ -8,6 +8,7 @@ use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use NS\FilteredPaginationBundle\Events\FilterEvent;
 use NS\FilteredPaginationBundle\FilteredPagination;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Spiriit\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 use Symfony\Component\Form\Form;
@@ -17,8 +18,34 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
+#[AllowMockObjectsWithoutExpectations]
 class FilteredPaginationTest extends TypeTestCase
 {
+    private FilterBuilderUpdaterInterface|MockObject $queryBuilderUpdater;
+    private PaginationInterface|MockObject $paginator;
+    private EntityManagerInterface|MockObject $entityMgr;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->queryBuilderUpdater = $this->createMock(FilterBuilderUpdaterInterface::class);
+        $this->paginator = $this->createMock(PaginatorInterface::class);
+        $this->entityMgr = $this->createMock(EntityManagerInterface::class);
+
+        $this->entityMgr
+            ->method('getConfiguration')
+            ->willReturn(new Configuration());
+
+        $event = $this->createMock(FilterEvent::class);
+
+        $event->method('hasNewQuery')->willReturn(false);
+
+        $this->dispatcher
+            ->method('dispatch')
+            ->willReturn($event);
+    }
+
     const string TEST_KEY = 'filtered.pagination';
 
     public function testEmpty(): void
@@ -37,8 +64,8 @@ class FilteredPaginationTest extends TypeTestCase
             ->willReturn($this->createMock(PaginationInterface::class));
 
         $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
-        $session            = new Session(new MockArraySessionStorage());
-        $request            = new Request();
+        $session = new Session(new MockArraySessionStorage());
+        $request = new Request();
         $request->setSession($session);
 
         $result = $filteredPagination->process($request, FilteredPaginationForm::class, $query, self::TEST_KEY);
@@ -62,13 +89,13 @@ class FilteredPaginationTest extends TypeTestCase
             ->with($query, 1, 10);
 
         $formData = [
-            'date'   => '',
+            'date' => '',
             'amount' => '',
-            'reset'  => '',
+            'reset' => '',
         ];
 
         $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
-        $session            = new Session(new MockArraySessionStorage());
+        $session = new Session(new MockArraySessionStorage());
         $session->set(self::TEST_KEY, ['amount' => 10.00]);
         self::assertEquals(['amount' => 10.00], $session->get(self::TEST_KEY));
         $request = new Request();
@@ -102,13 +129,13 @@ class FilteredPaginationTest extends TypeTestCase
             ->willReturn($this->createMock(PaginationInterface::class));
 
         $formData = [
-            'date'   => '',
+            'date' => '',
             'amount' => 10.00,
-            'reset'  => '',
+            'reset' => '',
         ];
 
         $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
-        $session            = new Session(new MockArraySessionStorage());
+        $session = new Session(new MockArraySessionStorage());
         $session->set(self::TEST_KEY, ['amount' => 10.00]);
         self::assertEquals(['amount' => 10.00], $session->get(self::TEST_KEY));
         $request = new Request();
@@ -149,13 +176,13 @@ class FilteredPaginationTest extends TypeTestCase
             ->willReturn($this->createMock(PaginationInterface::class));
 
         $formData = [
-            'date'   => '',
+            'date' => '',
             'amount' => '12.30',
             'filter' => '',
         ];
 
         $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
-        $session            = new Session(new MockArraySessionStorage());
+        $session = new Session(new MockArraySessionStorage());
         $session->set(self::TEST_KEY, 'something');
         self::assertEquals('something', $session->get(self::TEST_KEY));
         $request = new Request([], ['FilteredPaginationForm' => $formData]);
@@ -187,13 +214,13 @@ class FilteredPaginationTest extends TypeTestCase
             ->method('paginate');
 
         $formData = [
-            'date'   => '',
+            'date' => '',
             'amount' => '12.30',
             'filter' => '',
         ];
 
         $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
-        $session            = new Session(new MockArraySessionStorage());
+        $session = new Session(new MockArraySessionStorage());
         $session->set(self::TEST_KEY, 'something');
         self::assertEquals('something', $session->get(self::TEST_KEY));
         $request = new Request(['page' => 3], ['FilteredPaginationForm' => $formData]);
@@ -212,8 +239,8 @@ class FilteredPaginationTest extends TypeTestCase
     public function testPerPage(): void
     {
         $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
-        $session            = new Session(new MockArraySessionStorage());
-        $request            = new Request();
+        $session = new Session(new MockArraySessionStorage());
+        $request = new Request();
         $request->setSession($session);
 
         self::assertEquals(10, $filteredPagination->getPerPage());
@@ -227,8 +254,8 @@ class FilteredPaginationTest extends TypeTestCase
     public function testRequestPerPage(): void
     {
         $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
-        $session            = new Session(new MockArraySessionStorage());
-        $request            = new Request();
+        $session = new Session(new MockArraySessionStorage());
+        $request = new Request();
         $request->query->set('limit', 25);
         $request->setSession($session);
 
@@ -246,7 +273,7 @@ class FilteredPaginationTest extends TypeTestCase
         $limitKey = self::TEST_KEY . '.limit';
 
         $filteredPagination = new FilteredPagination($this->paginator, $this->factory, $this->queryBuilderUpdater, $this->dispatcher);
-        $session            = new Session(new MockArraySessionStorage());
+        $session = new Session(new MockArraySessionStorage());
         $session->set($limitKey, 45);
 
         $request = new Request();
@@ -259,34 +286,6 @@ class FilteredPaginationTest extends TypeTestCase
         self::assertEquals(45, $filteredPagination->getPerPage());
         self::assertTrue($session->has(self::TEST_KEY . '.limit'));
         self::assertEquals(45, $session->get(self::TEST_KEY . '.limit'));
-    }
-
-    private FilterBuilderUpdaterInterface|MockObject $queryBuilderUpdater;
-    private PaginationInterface|MockObject $paginator;
-    private EntityManagerInterface|MockObject $entityMgr;
-    private FilterEvent|MockObject $event;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->queryBuilderUpdater = $this->createMock(FilterBuilderUpdaterInterface::class);
-        $this->paginator           = $this->createMock(PaginatorInterface::class);
-
-        $config          = new Configuration();
-        $this->entityMgr = $this->createMock(EntityManagerInterface::class);
-
-        $this->entityMgr
-            ->method('getConfiguration')
-            ->willReturn($config);
-
-        $this->event = $this->createMock(FilterEvent::class);
-
-        $this->event->method('hasNewQuery')->willReturn(false);
-
-        $this->dispatcher
-            ->method('dispatch')
-            ->willReturn($this->event);
     }
 
     protected function getExtensions(): array
