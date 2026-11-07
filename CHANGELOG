@@ -1,4 +1,10 @@
 
+VERSION 6  ALLOW SF8 AND PHP 8.3
+================================
+
+   Version 6.0 - Allow SF8 and PHP 8.3
+      06/11/2026 23:07  6.0.0  initial release
+
 VERSION 5  SUPPORT SF7, BUMP MIN PHP VERSION, ADD TYPEHINTS"
 ============================================================
 
